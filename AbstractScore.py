@@ -9,7 +9,7 @@ import math
 
 class AbstractScore(ABC):
 
-    _allRVDistributions: List[RVDistribution]  = []
+    #_allRVDistributions: List[RVDistribution]  = []
         
     @abstractmethod
     def specificScore(self, graphPath: GraphPath) -> float:
