@@ -32,8 +32,8 @@ class PathPoint:
     
     @staticmethod
     def getSpeedByAccel(time: float, prevPtTime: float, prevPtSpeed: float, accel: float, prevPtAccel: float) -> float:
-        return prevPtSpeed + (time - prevPtTime) * PathPoint.getAvgAccel(accel, prevPtAccel)
+        return prevPtSpeed + (time - prevPtTime) * PathPoint.getAvgSpeedOrAccel(accel, prevPtAccel)
 
     @staticmethod
-    def getAvgAccel(accel: float, prevPtAccel: float) -> float:
+    def getAvgSpeedOrAccel(accel: float, prevPtAccel: float) -> float:
         return (prevPtAccel + accel)/2
