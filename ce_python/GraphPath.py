@@ -16,146 +16,124 @@ import math
 import sys
 
 class GraphPath:
-    #_path: List[PathPoint] = [] #list of pairs <time,index> of graph nodes (0..52 for TSP, 0..20x20-1 for chessboard, 0..numObservableNodes-1 for CrossEntropyBNObservations)
-    #_bIsGoodPath: bool #false only for ChessBoard path that doesn't reach destination
-    
-    #used for debug only
-    static_ID: int = 0
-    #_sHashID: str #a hash code that is valid only after path is fully set (all "append"'s are done)
-    #uniquePathID: int #while sHashID can be shared when a path is regenerated over and over again, unique ID is generated once - better for debug
-    #eTYPE_OF_RV: TYPE_OF_RV
-    #environment: Environment
-    
-    #GraphPath(TYPE_OF_RV eTYPE_OF_RV, Environment environment)
-    def __init__ (self, eTYPE_OF_RV: TYPE_OF_RV, environment, myRvDistribution = None):
-        self.path: List[PathPoint] = []
-        self.bIsGoodPath = True #false only for ChessBoard path that doesn't reach destination
-        self.sHashID = "" #i.e., unset
-        self.eTYPE_OF_RV = eTYPE_OF_RV
-        self.environment = environment
-        self.myRvDistribution = myRvDistribution
-        self.uniquePathID = GraphPath.static_ID
-        GraphPath.static_ID+=1
+	static_ID: int = 0
+	def __init__ (self, eTYPE_OF_RV: TYPE_OF_RV, environment, myRvDistribution = None):
+		self.path: List[PathPoint] = []
+		self.bIsGoodPath = True #false only for ChessBoard path that doesn't reach destination
+		self.sHashID = "" #i.e., unset
+		self.eTYPE_OF_RV = eTYPE_OF_RV
+		self.environment = environment
+		self.myRvDistribution = myRvDistribution
+		self.uniquePathID = GraphPath.static_ID
+		GraphPath.static_ID+=1
 
-    #for debug, or for setting fixed paths, like Ego and Adversary#1
-	#Note: speed setting is for EGO, Adversary#1 will be overwrite this settings
-	#GraphPath(String  str, Environment environment, TYPE_OF_RV eTYPE_OF_RV)
-    @classmethod
-    def from_fixed_path(cls, str: Str, eTYPE_OF_RV: TYPE_OF_RV, environment) -> GraphPath:
-        graphPath = cls(eTYPE_OF_RV,environment)
-        dTime: float = 0
-        nIndex: int = 0
+	# for debug, or for setting fixed paths, like Ego and Adversary#1
+	# Note: speed setting is for EGO, Adversary#1 will be overwrite this settings
+	# GraphPath(String  str, Environment environment, TYPE_OF_RV eTYPE_OF_RV)
+	@classmethod
+	def from_fixed_path(cls, str: Str, eTYPE_OF_RV: TYPE_OF_RV, environment) -> GraphPath:
+		graphPath = cls(eTYPE_OF_RV,environment)
+		dTime: float = 0
+		nIndex: int = 0
         # []: split on pattern that contains these characters
         # \(: literal '('
-        # \(: literal ')'
-        # | : logical 'or' (compare to '||' in Java)       
-        parts = re.split('[\(|\)]',str)
-        for part in parts:
-            sPart = part.strip()
-            if(sPart==("")): continue
-            subparts = sPart.split(",")
-            nPart0: int = int(subparts[0])
-            nPart1: int = int(subparts[1])
-            #n: int = environment.fromPairToVertex(ChessBoardPositionPair(nPart0,nPart1))
-            n = nPart0 * 20 + nPart1
-            dSpeed: float = float(nIndex)%3 + 1  
-            #speed is 1,2,3,1,2,3. NOTE! this speed setting is for EGO, Adversary#1 will be overwrite this settings
-            dTime += 1/dSpeed
-            graphPath.append(nIndex, n, dTime, dSpeed)
-            nIndex += 1
+		# \(: literal ')'
+		# | : logical 'or' (compare to '||' in Java)
+		parts = re.split('[\(|\)]',str)
+		for part in parts:
+			sPart = part.strip()
+			if(sPart==("")): continue
+			subparts = sPart.split(",")
+			nPart0: int = int(subparts[0])
+			nPart1: int = int(subparts[1])
+			#n: int = environment.fromPairToVertex(ChessBoardPositionPair(nPart0,nPart1))
+			n = nPart0 * 20 + nPart1
+			dSpeed: float = float(nIndex)%3 + 1  
+			#speed is 1,2,3,1,2,3. NOTE! this speed setting is for EGO, Adversary#1 will be overwrite this settings
+			dTime += 1/dSpeed
+			graphPath.append(nIndex, n, dTime, dSpeed)
+			nIndex += 1
+		return graphPath
+	
+	def append(self, indexInPath: int, pt: int, time: float, speed: float):
+		pathPt = PathPoint(indexInPath, pt, time, speed)
+		self.path.append(pathPt)
+		self.sHashID += str(pathPt.pt)+","
 
-        return graphPath
-    
-    def append(self, indexInPath: int, pt: int, time: float, speed: float):
-        pathPt = PathPoint(indexInPath, pt, time, speed)
-        self.path.append(pathPt)
-        self.sHashID += str(pathPt.pt)+","
-    
-    @abstractmethod
-    def getBasePath(self) -> GraphPath:
-        pass
-    
-    def printMeAsChessboardPath(self, environment) -> None:
-        print(f"2D (ChessBoard) path(uniquePathID=\"{self.getUniquePathID()}\")")
-        for pairPt in self.path:
-            pair: ChessBoardPositionPair = environment.fromVertexToPair(pairPt.pt)
-            print(f"n={pairPt.pt}<{pair.get_i()},{pair.get_j()}>@t={pairPt.time}-->")
+	@abstractmethod
+	def getBasePath(self) -> GraphPath:
+		pass
+	
+	def printMeAsChessboardPath(self, environment) -> None:
+		print(f"2D (ChessBoard) path(uniquePathID=\"{self.getUniquePathID()}\")")
+		for pairPt in self.path:
+			pair: ChessBoardPositionPair = environment.fromVertexToPair(pairPt.pt)
+			print(f"n={pairPt.pt}<{pair.get_i()},{pair.get_j()}>@t={pairPt.time}-->")
+	
+	#get speed for Adversaries that DON'T use CE to compute speed, but rather have pre-determined fixed speed
+	def getAdversaryCategoricalFixedSpeedAt(self, nIndex: int) -> float:
+		raise Exception("GraphPath.getAdversaryCategoricalFixedSpeedAt should not be reached! Only an inherited method such as GraphPath_Adversary2.getAdversaryCategoricalFixedSpeedAt() should be reached")
+	def getHashID(self) -> str: return self.sHashID
+	def getUniquePathID(self) -> int: return self.uniquePathID
+	
+	def getPathPointBySpeed(self, indexInPath: int, pt: int,speed: float) -> PathPoint:
+		dThisPtTime: float = 0
+		if (indexInPath > 0):
+			prevPoint: PathPoint = self.get(indexInPath-1)
+			dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
+			dAvgSpeed: float = PathPoint.getAvgSpeedOrAccel(speed, prevPoint.speedOrAccel) # speed to get from pt i to i+1 is the avg of speeds at points i,i+1
+			if (dAvgSpeed == 0): dOneCellTime: float = 0
+			else: dOneCellTime: float = dist/dAvgSpeed;# meter/(meter/sec) == sec
+			dThisPtTime = prevPoint.time + dOneCellTime
+		newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, speed)
+		return newPointObject
+		
+	def getPathPointByAccel(self, indexInPath: int, pt: int, accel: float) -> PathPoint:
+		dThisPtTime: float = 0
+		newSpeed: float = TestConstants.INITIAL_ADVERSARY1_SPEED
+		if (indexInPath > 0):
+			prevPoint: PathPoint = self.get(indexInPath-1)
+			dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
+			dAvgAccel: float = PathPoint.getAvgSpeedOrAccel(accel, prevPoint.speedOrAccel)
+			dOneCellTime: float = 0
+			if (dAvgAccel == 0):
+				constSpeed: float = prevPoint.speed
+				dOneCellTime = dist/constSpeed
+				newSpeed = prevPoint.speed
+			else:
+				dVsqare: float = prevPoint.speed * prevPoint.speed + 2 * dAvgAccel * dist
+				if (dVsqare < 0):
+					dVsqare = prevPoint.speed * prevPoint.speed - 2 * dAvgAccel * dist
+				newSpeed = math.sqrt(dVsqare)
+				if (newSpeed == 0): dOneCellTime = sys.float_info.max
+				else: dOneCellTime = dist/newSpeed
+			dThisPtTime = prevPoint.time + dOneCellTime	
+		newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, accel, newSpeed)
+		return newPointObject
+	
+	def putPointAt(self, indexInPath: int, pt: int, speedOrAccel: float):
+		eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV # // is speedOrAccel speed or acceleration?
+		if(eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV):
+			newPointObject = self.getPathPointBySpeed(indexInPath, pt, speedOrAccel)
+		elif(eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV):
+			newPointObject = self.getPathPointByAccel(indexInPath, pt, speedOrAccel)
+		else:
+			raise Exception("Unrecognized eTYPE_OF_RV in putPointAt()")
+		self.append(newPointObject)
+	
+	def updatePointAt(self, indexInPath: int, pt: int, speedOrAccel: float):
+		eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV
+		if(eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV):
+			newPointObject = self.getPathPointBySpeed(indexInPath, pt, speedOrAccel)
+		elif(eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV):
+			newPointObject = self.getPathPointByAccel(indexInPath, pt, speedOrAccel)
+		else:
+			raise Exception("Unrecognized eTYPE_OF_RV in updatePointAt()")
+		self.path[indexInPath] = newPointObject
 
 
-    #get speed for Adversaries that DON'T use CE to compute speed, but rather have pre-determined fixed speed
-    def getAdversaryCategoricalFixedSpeedAt(self, nIndex: int) -> float:
-        raise Exception("GraphPath.getAdversaryCategoricalFixedSpeedAt should not be reached! Only an inherited method such as GraphPath_Adversary2.getAdversaryCategoricalFixedSpeedAt() should be reached")
-    
-    def getHashID(self) -> str: return self.sHashID
-    def getUniquePathID(self) -> int: return self.uniquePathID
-
-    def getPathPointBySpeed(self, indexInPath: int, pt: int,speed: float) -> PathPoint:
-        dThisPtTime: float = 0
-        if (indexInPath > 0):
-            prevPoint: PathPoint = self.get(indexInPath-1)
-            dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
-            dAvgSpeed: float = PathPoint.getAvgSpeedOrAccel(speed, prevPoint.speedOrAccel) # speed to get from pt i to i+1 is the avg of speeds at points i,i+1
-            if (dAvgSpeed == 0): dOneCellTime: float = 0
-            else: dOneCellTime: float = dist/dAvgSpeed;# meter/(meter/sec) == sec 
-            dThisPtTime = prevPoint.time + dOneCellTime; 
-        newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, speed)
-        return newPointObject
-
-    def getPathPointByAccel(self, indexInPath: int, pt: int, accel: float) -> PathPoint:
-        dThisPtTime: float = 0
-        newSpeed: float = TestConstants.INITIAL_ADVERSARY1_SPEED
-        if (indexInPath > 0):
-            prevPoint: PathPoint = self.get(indexInPath-1)
-            dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
-            dAvgAccel: float = PathPoint.getAvgSpeedOrAccel(accel, prevPoint.speedOrAccel)
-            dOneCellTime: float = 0
-            if (dAvgAccel == 0):
-                constSpeed: float = prevPoint.speed
-                dOneCellTime = dist/constSpeed
-                newSpeed = prevPoint.speed
-            else:
-                dOneCellTime = -prevPoint.speed + math.sqrt(prevPoint.speed * prevPoint.speed + 2 * dAvgAccel * dist) / dAvgAccel
-                newSpeed = prevPoint.speed + dAvgAccel * dOneCellTime
-                dVsqare: float = prevPoint.speed * prevPoint.speed + 2 * dAvgAccel * dist
-                if (dVsqare < 0):
-                    dVsqare = prevPoint.speed * prevPoint.speed - 2 * dAvgAccel * dist
-                newSpeed = math.sqrt(dVsqare)
-                if (newSpeed == 0): dOneCellTime = sys.float_info.max
-                else: dOneCellTime = dist/newSpeed
-            dThisPtTime = prevPoint.time + dOneCellTime	
-        newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, accel, newSpeed)
-        return newPointObject
 
 """
-public void putPointAt(int indexInPath, int pt, double speedOrAccel) throws Exception {
-		TYPE_OF_RV eTYPE_OF_RV = this.eTYPE_OF_RV; // is speedOrAccel speed or acceleration?
-		putPointAt( indexInPath,  pt, speedOrAccel, eTYPE_OF_RV);
-	}
-	public void putPointAt(int indexInPath, int pt, double speedOrAccel, TYPE_OF_RV __eTYPE_OF_RV) throws Exception {
-		
-		PathPoint newPointObject = null;
-		if (__eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV) newPointObject = getPathPointBySpeed(indexInPath, pt, speedOrAccel);
-		else if (__eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV) newPointObject = getPathPointByAccel(indexInPath, pt, speedOrAccel);
-		else throw new Exception("Unrecognized __eTYPE_OF_RV in putPointAt()");
-		
-		this.append(newPointObject);
-
-	}
-	
-	public void updatePointAt(int indexInPath, int pt, double speedOrAccel) throws Exception {
-		TYPE_OF_RV eTYPE_OF_RV = this.eTYPE_OF_RV; // is speedOrAccel speed or acceleration?
-		updatePointAt(indexInPath, pt, speedOrAccel, eTYPE_OF_RV);
-	}
-	public void updatePointAt(int indexInPath, int pt, double speedOrAccel, TYPE_OF_RV __eTYPE_OF_RV) throws Exception {
-		
-		PathPoint newPointObject = null;
-		if (__eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV) newPointObject = getPathPointBySpeed(indexInPath, pt, speedOrAccel);
-		else if (__eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV) newPointObject = getPathPointByAccel(indexInPath, pt, speedOrAccel);
-		else throw new Exception("Unrecognized __eTYPE_OF_RV in putPointAt()");
-		
-		this.path.set(indexInPath,newPointObject);
-
-	}
 	
 	public ArrayList<PathPoint> getPathPoints() {
 		return this.path;
