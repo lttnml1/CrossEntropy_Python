@@ -16,19 +16,15 @@ class PathPoint:
     #Python cannot overload constructors, so use __init__() to initialize with speed, from_accel initializes with accel
     #used when speedOrAccel RV is speed
     #PathPoint(int indexInPath, int pt, double time, double speed)
-    def __init__ (self, indexInPath: int, pt: int, time: float, speed: float):
+    def __init__ (self, indexInPath: int, pt: int, time: float, speed: float, accel: float = None):
         self.indexInPath = indexInPath
         self.pt = pt
-        self.speedOrAccel = speed
-        self.speed = speed
         self.time = time
-
-    #used when speedOrAccel RV is accel
-    #PathPoint(int indexInPath, int pt, double time, double accel, double prevPtTime, double prevPtSpeed, double prevPtAccel)
-    @classmethod
-    def from_accel (cls, indexInPath: int, pt: int, time: float, accel: float, prevPtTime: float, prevPtSpeed: float, prevPtAccel: float):
-        speed = cls.getSpeedByAccel(time, prevPtTime, prevPtSpeed, accel, prevPtAccel)
-        return cls(indexInPath, pt, time, speed)
+        self.speed = speed
+        if accel is not None:
+            self.speedOrAccel = accel
+        else:
+            self.speedOrAccel = speed
     
     @staticmethod
     def getSpeedByAccel(time: float, prevPtTime: float, prevPtSpeed: float, accel: float, prevPtAccel: float) -> float:

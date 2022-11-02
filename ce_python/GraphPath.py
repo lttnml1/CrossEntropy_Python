@@ -46,8 +46,8 @@ class GraphPath:
 			subparts = sPart.split(",")
 			nPart0: int = int(subparts[0])
 			nPart1: int = int(subparts[1])
-			#n: int = environment.fromPairToVertex(ChessBoardPositionPair(nPart0,nPart1))
-			n = nPart0 * 20 + nPart1
+			n: int = environment.fromPairToVertex(ChessBoardPositionPair(nPart0,nPart1))
+			#n = nPart0 * 20 + nPart1
 			dSpeed: float = float(nIndex)%3 + 1  
 			#speed is 1,2,3,1,2,3. NOTE! this speed setting is for EGO, Adversary#1 will be overwrite this settings
 			dTime += 1/dSpeed
@@ -64,7 +64,8 @@ class GraphPath:
 	def getBasePath(self) -> GraphPath:
 		pass
 	
-	def printMeAsChessboardPath(self, environment) -> None:
+	def printMeAsChessboardPath(self, environment, Msg: str = None) -> None:
+		if(str): print(str)
 		print(f"2D (ChessBoard) path(uniquePathID=\"{self.getUniquePathID()}\")")
 		for pairPt in self.path:
 			pair: ChessBoardPositionPair = environment.fromVertexToPair(pairPt.pt)
@@ -94,6 +95,7 @@ class GraphPath:
 		if (indexInPath > 0):
 			prevPoint: PathPoint = self.get(indexInPath-1)
 			dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
+			dist = 3
 			dAvgAccel: float = PathPoint.getAvgSpeedOrAccel(accel, prevPoint.speedOrAccel)
 			dOneCellTime: float = 0
 			if (dAvgAccel == 0):
@@ -108,7 +110,7 @@ class GraphPath:
 				if (newSpeed == 0): dOneCellTime = sys.float_info.max
 				else: dOneCellTime = dist/newSpeed
 			dThisPtTime = prevPoint.time + dOneCellTime	
-		newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, accel, newSpeed)
+		newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, newSpeed, accel)
 		return newPointObject
 	
 	def putPointAt(self, indexInPath: int, pt: int, speedOrAccel: float):
@@ -130,152 +132,113 @@ class GraphPath:
 		else:
 			raise Exception("Unrecognized eTYPE_OF_RV in updatePointAt()")
 		self.path[indexInPath] = newPointObject
-
-
-
-"""
 	
-	public ArrayList<PathPoint> getPathPoints() {
-		return this.path;
-	}
+	def getPathPoints(self) -> List[PathPoint]:
+		return self.path
 	
-	public PathPoint get(int k) {
-		return this.path.get(k);
-	}
-
-
-	public int getPoint(int k) {
-		return this.path.get(k).pt;
-	}
+	def get(self, k: int) -> PathPoint:
+		return self.path[k]
 	
-	public int len() {
-		return this.path.size();
-	}
+	def getPoint(self, k: int) -> int:
+		return self.path[k].pt
 	
-	public boolean isGoodPath() {
-		return this.bIsGoodPath;
-	}
-	public void setNotGoodPath() {
-		this.bIsGoodPath = false;
-	}
+	def len(self) -> int:
+		return len(self.path)
 
+	def isGoodPath(self) -> bool:
+		return self.isGoodPath
 	
+	def setNotGoodPath(self) -> None:
+		self.bIsGoodPath = False
 	
-	public void printMe(String sMsg) {
-		System.out.print(sMsg);
-		for (PathPoint pathPt: path) System.out.print(pathPt.pt+"@t=" + pathPt.time + "/" + pathPt.speedOrAccel + ",");
-		System.out.println();
-	}
-
-
-
-	public void printMeAsChessboardPath(String Msg, Environment environment) {
-		System.out.println(Msg);
-		for (PathPoint pathPt: path) {
-			ChessBoardPositionPair pair = environment.fromVertexToPair(pathPt.pt);
-			System.out.println("n="+pathPt.pt+"<" + pair.get_i() + "," + pair.get_j()+"> -->");
-		}
-		System.out.println();
-	}
-
+	def printMe(self, sMsg: str) -> None:
+		print(sMsg)
+		for pathPt in self.path:
+			print(f"{pathPt.pt}@t={pathPt.time}/{pathPt.speedOrAccel},\n")
 	
+	"""
+	def visualize(environment, src: ChessBoardPositionPair, dest: ChessBoardPositionPair, egoPath: GraphPath, paths: List[GraphPath]):
+		v = Visualizer()
+		v._main([], environment, src, dest, paths, egoPath)
+	"""
 
+	def putSpeedPointAt(self, index: int, speedPoint: PathPoint) -> None:
+		if (index >= self.len()):
+			raise Exception("index >= len in putSpeedPointAt()")
+		self.path.insert(index, speedPoint)
 
-	public static void visualize(Environment environment,  ChessBoardPositionPair src, ChessBoardPositionPair dest, GraphPath egoPath, GraphPath[] paths) {
-				Visualizer v = new Visualizer();
-				v._main(new String[0], environment, src, dest, paths, egoPath);
-	}
-
-	/*
-	boolean isPathForDebug() {
-		String s = this.toStr();;
-		//if ( s.contains("209,188,168,149,130,111,90,89,68,47,26,7,8,29,10,31")) {
-		if ( s.contains("209,188,168,149,130,")) {
-			return true;
-		};
-		return false;
-	}
-
-	*/
-
-
+	# only used by adversaries that calculate their own speed (NormalDistrib and ExponentialDistrib)
+	def getSpeedPointAt(self, index: int) -> PathPoint:
+		if (index >= self.len()):
+			raise Exception("index >= len() in getSpeedPointAt()")
+		return self.get(index)
 	
-
+	# only used by Hybrid-distribution RV's, i.e., Adversary4 type
+	def getSpeedPointAtGridPoint(self, pt: int) -> PathPoint:
+		for nPt in range(self.len()):
+			pathPoint: PathPoint = self.getSpeedPointAt(nPt)
+			if (pathPoint.pt != pt): continue
+			return pathPoint
+		return None #i.e., point i,j is not on path
 	
-	public void putSpeedPointAt(int index, PathPoint speedPoint) throws Exception{
-		if (index >= this.len()) throw new Exception("index >= len in putSpeedPointAt()");
-		this.path.add(index, speedPoint);
-	}
-	// only used by adversaries that calculate their own speed (NormalDistrib and ExponentialDistrib)
-	public PathPoint getSpeedPointAt(int index) throws Exception {
-		if (index >= len()) 
-			throw new Exception("index >= len() in getSpeedPointAt()");
-		return this.get(index);
-	}
-	// only used by Hybrid-distribution RV's, i.e., Adversary4 type
-	public PathPoint getSpeedPointAtGridPoint(int pt) throws Exception {
-		for (int nPt = 0; nPt < this.len(); nPt++) {	
-			PathPoint pathPoint = getSpeedPointAt(nPt);
-			if (pathPoint.pt != pt) continue;
-			return pathPoint;
-		}
-		return null; //i.e., point i,j is not on path
-	}
-
-	public int getPointAt(int index) throws Exception{
-		return getSpeedPointAt(index).pt;
-	}
-
+	def getPointAt(self, index: int) -> int:
+		return self.getSpeedPointAt(index).pt
+	"""
 	// get some measure of the path -- used for experimental data-set creation (hopefully data-set with high variance)
 	   	// Use truncated Perturbation path that ends in "accident" point.
 	   	// This facilitated the generation a high-variance data-set that is based only on the part of the perturbation path UNTIL the "accident"
-	double getCategoricalPathMeasure(ArrayList<PathPoint> truncatedPath) throws Exception {
-		double dMeasure = 0;
-		for (PathPoint pathPt: truncatedPath) {
-			ChessBoardPositionPair pair = environment.fromVertexToPair(pathPt.pt);
-			double d_i = pair.get_i()*pair.get_i();
-			double d_j = pair.get_j()*pair.get_j();
-			dMeasure += Math.sqrt(d_i + d_j);
-		}
-		return dMeasure/truncatedPath.size(); // otherwise longer paths will be rewarded more
-	}
-	
-   	// Use truncated Perturbation path that ends in "accident" point.
-   	// This facilitated the generation a high-variance data-set that is based only on the part of the perturbation path UNTIL the "accident"
-	double getNormalPathMeasure(ArrayList<PathPoint> truncatedPath) throws Exception {
-		double dMeasure = 0;
-		for (PathPoint pathPt: truncatedPath) {
-			dMeasure += pathPt.speedOrAccel;
-		}
-		return dMeasure/truncatedPath.size();// otherwise longer paths will be rewarded more
-	}
-	
-	   	// Truncate Perturbation path! (now ends in "accident" point)
-	   	// This allows getNormalPathMeasure() and getCategoricalPathMeasure() [both here and in TestCase_Adv5Only_accel] to come up with 
-	   	//  a high-variance data-set that is beased only on the part of the perturbation path UNTIL the "accident"
-	public ArrayList<PathPoint>  truncatePathAfterPoint(int endPoint) throws Exception {
-		boolean bEndPointFound = false;
-		int nPt = 0;
-		for (; nPt < this.len(); nPt++) {
-			int pt = this.getPoint(nPt);
-			if (pt == endPoint) {
-				bEndPointFound = true;
-				break;
-			}
-		}
-		if (!bEndPointFound) 
-			throw new Exception("truncateAfterPoint error: endPoint not found, but should exists for perturbation path "); // for pert. path end point is point of "accident", which should exist by definition of being a pert. path
-		
-		if (nPt<this.len()-1) {
-			return new ArrayList<PathPoint>(this.path.subList(0, nPt+1)); // truncate but leave last point ("accident" point
-		}
-		return this.path;
-	}
-"""
+	"""
+	def getCategoricalPathMeasure(self, truncatedPath: List[PathPoint]) -> float:
+		dMeasure: float = 0
+		for pathPt in truncatedPath:
+			pair: ChessBoardPositionPair = self.environment.fromVertexToPair(pathPt.pt)
+			d_i: float = pair.get_i()**2
+			d_j: float = pair.get_j()**2
+			dMeasure += math.sqrt(d_i + d_j)
+		return dMeasure/len(truncatedPath) #otherwise longer paths will be rewarded more
 
-e = TYPE_OF_RV.ACCEL_RV
-env = None
-gp = GraphPath.from_fixed_path("(1,2)(3,4)(4,5)(6,7)",e,env)
-assert gp.getHashID() == "22,64,85,127,", f"Expected \"22,64,85,127\", got {gp.getHashID()}"
-assert gp.getUniquePathID() == 0, f"Expected 0, got {gp.getUniquePathID()}"
-gp.getPathPointByAccel(3,3,3.0)
+	"""
+	// Use truncated Perturbation path that ends in "accident" point.
+   	// This facilitated the generation a high-variance data-set that is based only on the part of the perturbation path UNTIL the "accident"
+	"""
+	def getNormalPathMeasure(self, truncatedPath: List[PathPoint]) -> float:
+		dMeasure: float = 0
+		for pathPt in truncatedPath:
+			dMeasure += pathPt.speedOrAccel
+		return dMeasure/len(truncatedPath) #otherwise longer paths will be rewarded more
+	
+	"""
+	// Truncate Perturbation path! (now ends in "accident" point)
+	// This allows getNormalPathMeasure() and getCategoricalPathMeasure() [both here and in TestCase_Adv5Only_accel] to come up with 
+	//  a high-variance data-set that is beased only on the part of the perturbation path UNTIL the "accident"
+	"""
+	def truncatePathAfterPoint(self, endPoint: int) -> List[PathPoint]:
+		bEndPointFound: bool = False
+		nPt: int = 0
+		for i in range(self.len()):
+			pt: int = self.getPoint(nPt)
+			if(pt == endPoint):
+				bEndPointFound = True
+				break
+			nPt += 1
+		if (not bEndPointFound):
+			raise Exception("truncateAfterPoint error: endPoint not found, but should exist for perturbation path")
+			# for pert. path end point is point of "accident", which should exist by definition of being a pert. path
+		if (nPt < self.len()-1):
+			return self.path[0:nPt+1]
+		return self.path
+	
+	abstractmethod
+	def test_class():
+		e = TYPE_OF_RV.ACCEL_RV
+		env = None
+		gp = GraphPath.from_fixed_path("(1,2)(3,4)(4,5)(6,7)",e,env)
+		assert gp.getHashID() == "22,64,85,127,", f"Expected \"22,64,85,127\", got {gp.getHashID()}"
+		assert gp.getUniquePathID() == 0, f"Expected 0, got {gp.getUniquePathID()}"
+		gp.getPathPointByAccel(3,3,3.0)
+		print(gp.len())
+
+
+
+		
+
