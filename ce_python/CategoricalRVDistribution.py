@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ce_python.RVDistribution import RVDistribution
 from ce_python.TYPE_OF_RV import TYPE_OF_RV
+from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
 
 import numpy as np
 from abc import abstractmethod
@@ -30,8 +31,22 @@ class CategoricalRVDistribution(RVDistribution):
     def initDistribution(self):
         p_ij = 1.0 / float(self.m)
         self.trans_mat[:] = p_ij
+
+        self.avoidOffBoardPositions(self.trans_mat)
+        
     
+    def avoidOffBoardPositions(self, _trans_mat):
+        for i in range(self.n):
+            for j in range(self.m):
+                if(self.isOffBoard(i,j)):
+                    _trans_mat[i,j] = 0 #i.e. don't allow going off board
     
+    def isOffBoard(self, vertex: int, neighborCode: int) -> bool:
+        pass
+        
+
+    
+
     
     def generateGraphPath(self, nAgent: int):
         return super().generateGraphPath(nAgent)
