@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from typing_extensions import Self
 import numpy as np
+from abc import abstractmethod
+
+from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
 
 #g=Grid(20,20)
 #g.Grid_constructor()
@@ -77,12 +80,56 @@ class Grid:
         if (i < 0 or j < 0): return False
         if (i >= num_rows or j >= num_columns): return False
         return grid[i,j]==-4
+    
+    def isDistanceOneFromLongWall(self, location: int, gridContainer: Self) -> bool:
+        chessBoardPositionPair_location = self.fromVertexToPair(location)
+        i: int = chessBoardPositionPair_location.get_i()
+        j: int = chessBoardPositionPair_location.get_j()
+        #Remember, the grid is transposed (see constructor above)
+        b: bool = Grid.isOnLongWall(i,j,gridContainer) or \
+                Grid.isOnLongWall(i+1,j, gridContainer) or \
+                Grid.isOnLongWall(i,j+1,gridContainer) or \
+                Grid.isOnLongWall(i-1,j,gridContainer) or \
+                Grid.isOnLongWall(i,j-1,gridContainer) or \
+                Grid.isOnLongWall(i+1,j+1,gridContainer) or \
+                Grid.isOnLongWall(i-1,j-1,gridContainer) or \
+                Grid.isOnLongWall(i+1,j-1,gridContainer) or \
+                Grid.isOnLongWall(i-1,j+1,gridContainer)
+        return b
 
-g=Grid(20,20)
-print("NEW\n")
-g2 = np.copy(g.getGrid())
-rows, columns = g2.shape
-print(str(rows) + str(columns))
-g2[0,0]=999
-print(g._grid[0,0])
-print(g2[0,0])
+    def isToRightOfRed_L_obstacle(self, x: int, y: int) -> bool:
+        b: bool = (y >= 16 and y <= 18 and x >4)
+        # X is j, Y is i in visualizer!!
+        return b
+    
+    def fromVertexToPair(self, vertex: int) -> ChessBoardPositionPair:
+        j: int = vertex % self.getBoardWidth()
+        i: int = vertex / self.getBoardWidth()
+        return ChessBoardPositionPair(i,j)
+    
+    def fromPairToVertex(self, pair: ChessBoardPositionPair) -> int:
+        return pair.get_i() * self.getBoardWidth() + pair.get_j()
+    
+    def setGrid(self, newGrid: np.ndarray) -> None:
+        self._grid = newGrid
+    
+    def getBoardHeight(self) -> int: 
+        return self._grid.shape[0]
+    
+    def getBoardWidth(self) -> int: 
+        return self._grid.shape[1]
+    
+    def loadASWgridFromFile(self):
+        raise NotImplementedError("loadASWgridFromFile not implemented")
+    
+    @abstractmethod
+    def test_class():
+        g=Grid(20,20)
+        print("NEW\n")
+        g2 = np.copy(g.getGrid())
+        rows, columns = g2.shape
+        print(str(rows) + str(columns))
+        g2[0,0]=999
+        print(g._grid[0,0])
+        print(g2[0,0])
+        print(g.loadASWgridFromFile())

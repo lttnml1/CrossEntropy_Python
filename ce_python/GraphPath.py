@@ -237,8 +237,3 @@ class GraphPath:
 		assert gp.getUniquePathID() == 0, f"Expected 0, got {gp.getUniquePathID()}"
 		gp.getPathPointByAccel(3,3,3.0)
 		print(gp.len())
-
-
-
-		
-
