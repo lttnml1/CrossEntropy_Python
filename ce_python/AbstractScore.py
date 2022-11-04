@@ -1,22 +1,23 @@
 #!/usr/bin/env python
-from abc import ABC, abstractmethod
-from ce_python.RVDistribution import RVDistribution
-from ce_python.GraphPath import GraphPath
+from __future__ import annotations
+
 from ce_python.BadScoreLevels import BadScoreLevels
-from ce_python.PathPoint import PathPoint
+from ce_python.GraphPath import GraphPath
+
+from abc import ABC, abstractmethod
 from typing import List
 import math
 
 class AbstractScore(ABC):
         
     @abstractmethod
-    def specificScore(self, graphPath: GraphPath, t: int) -> float:
+    def specificScore(self, graphPath: object, t: int) -> float:
         pass
 
-    def setAllRVDistributions(self, allRVDistributions: List[RVDistribution]) -> None:
+    def setAllRVDistributions(self, allRVDistributions) -> None:
         self.allRVDistributions = allRVDistributions
     
-    def score(self, graphPath: GraphPath, t: int) -> float:
+    def score(self, graphPath: object, t: int) -> float:
         #!isGoodPath is not used for Matt's CE; all egregious paths are scored here anyway 
         if not graphPath.isGoodPath():
             return BadScoreLevels.BAD_PATH #since we're minimizing then indeed this is a bad score
@@ -28,12 +29,12 @@ class AbstractScore(ABC):
         return d
     
     @staticmethod
-    def s_AbstractScoreDueDiligence(graphPath: GraphPath) -> float:
+    def s_AbstractScoreDueDiligence(graphPath: object) -> float:
         dRet: float = 0
         #No negative speed, no negative time, no time moving backwards, no NaN's
         prev_time: float = 0
         for i in range(0,graphPath.len()):
-            pathPoint: PathPoint = graphPath.get(i)
+            pathPoint = graphPath.get(i)
             if (math.isnan(pathPoint.speed) or math.isnan(pathPoint.time)):
                 #NaN can happen in getPathPointByAccel() when sqrt is performed on a negative
                 #**What happens in python with the square root of a negative number? Throws ValueError - do exception handling like:

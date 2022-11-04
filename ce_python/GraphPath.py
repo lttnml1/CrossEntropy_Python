@@ -1,23 +1,21 @@
 #!/usr/bin/env python
-
 from __future__ import annotations
-from abc import abstractmethod
-
-from ast import Str
-from typing import List
 
 from ce_python.PathPoint import PathPoint
-from ce_python.TYPE_OF_RV import TYPE_OF_RV
 from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
 from ce_python.TestConstants import TestConstants
+from ce_python.TYPE_OF_RV import TYPE_OF_RV
+from ce_python.Environment import Environment
 
+from abc import abstractmethod
+from typing import List
 import re
 import math
 import sys
 
 class GraphPath:
 	static_ID: int = 0
-	def __init__ (self, eTYPE_OF_RV: TYPE_OF_RV, environment, myRvDistribution = None):
+	def __init__ (self, eTYPE_OF_RV, environment: Environment, myRvDistribution = None):
 		self.path: List[PathPoint] = []
 		self.bIsGoodPath = True #false only for ChessBoard path that doesn't reach destination
 		self.sHashID = "" #i.e., unset
@@ -31,7 +29,7 @@ class GraphPath:
 	# Note: speed setting is for EGO, Adversary#1 will be overwrite this settings
 	# GraphPath(String  str, Environment environment, TYPE_OF_RV eTYPE_OF_RV)
 	@classmethod
-	def from_fixed_path(cls, str: Str, eTYPE_OF_RV: TYPE_OF_RV, environment) -> GraphPath:
+	def from_fixed_path(cls, str, eTYPE_OF_RV, environment) -> GraphPath:
 		graphPath = cls(eTYPE_OF_RV,environment)
 		dTime: float = 0
 		nIndex: int = 0
@@ -95,7 +93,7 @@ class GraphPath:
 		if (indexInPath > 0):
 			prevPoint: PathPoint = self.get(indexInPath-1)
 			dist: float = self.environment.getCellToCelDist(prevPoint.pt, pt)
-			dist = 3
+			#dist = 3
 			dAvgAccel: float = PathPoint.getAvgSpeedOrAccel(accel, prevPoint.speedOrAccel)
 			dOneCellTime: float = 0
 			if (dAvgAccel == 0):
@@ -228,10 +226,11 @@ class GraphPath:
 			return self.path[0:nPt+1]
 		return self.path
 	
-	abstractmethod
+	@staticmethod
 	def test_class():
+		from ce_python.Grid import Grid
 		e = TYPE_OF_RV.ACCEL_RV
-		env = None
+		env = Environment(Grid(20,20))
 		gp = GraphPath.from_fixed_path("(1,2)(3,4)(4,5)(6,7)",e,env)
 		assert gp.getHashID() == "22,64,85,127,", f"Expected \"22,64,85,127\", got {gp.getHashID()}"
 		assert gp.getUniquePathID() == 0, f"Expected 0, got {gp.getUniquePathID()}"

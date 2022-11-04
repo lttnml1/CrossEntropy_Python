@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 #** EXAMPLE MULTIPLE CONSTRUCTOR USAGE **
 #       pp=PathPoint(1,2,3.0,4.0)
 #       print(pp.speed)

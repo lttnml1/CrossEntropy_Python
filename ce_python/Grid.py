@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
+from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
+
 from typing_extensions import Self
 import numpy as np
 from abc import abstractmethod
-
-from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
 
 #g=Grid(20,20)
 #g.Grid_constructor()
@@ -66,7 +68,7 @@ class Grid:
         self._grid[13:15,11] = -8
 
         np.set_printoptions(linewidth=np.inf)
-        print(self._grid)
+        #print(self._grid)
 
         #**DID NOT IMPLEMENT the section for: //***When height > 20 then add more obstacles
     
@@ -122,7 +124,7 @@ class Grid:
     def loadASWgridFromFile(self):
         raise NotImplementedError("loadASWgridFromFile not implemented")
     
-    @abstractmethod
+    @staticmethod
     def test_class():
         g=Grid(20,20)
         print("NEW\n")
@@ -132,4 +134,5 @@ class Grid:
         g2[0,0]=999
         print(g._grid[0,0])
         print(g2[0,0])
-        print(g.loadASWgridFromFile())
+        print(g.getBoardHeight())
+

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
 import sys
 
 MAX_VALUE = sys.float_info.max

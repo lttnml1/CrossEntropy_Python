@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
 from enum import Enum, auto
 
 class TYPE_OF_RV(Enum):

@@ -1,16 +1,19 @@
 #!/usr/bin/env python
+from __future__ import annotations
 
-from ce_python.GraphPath import GraphPath
-from ce_python.TYPE_OF_RV import TYPE_OF_RV
+
 from ce_python.CODE_EFFICIENCIES import CODE_EFFICIENCIES
 from ce_python.TestConstants import TestConstants
+from ce_python.GraphPath import GraphPath
+from ce_python.TYPE_OF_RV import TYPE_OF_RV
+from ce_python.AbstractScore import AbstractScore
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 import math
 
-class RVDistribution:
+class RVDistribution(ABC):
 
-    def __init__(self, scoreObject, clazz: str, my_CE_Manager, eTYPE_OF_RV: TYPE_OF_RV):
+    def __init__(self, scoreObject: object, clazz: str, my_CE_Manager, eTYPE_OF_RV: TYPE_OF_RV):
         self.scoreObject = scoreObject
         self.clazz = clazz
         self.my_CE_Manager = my_CE_Manager
