@@ -1,20 +1,21 @@
 #!/usr/bin/env python
-from __future__ import annotations
 
-from ce_python.BadScoreLevels import BadScoreLevels
-from ce_python.GraphPath import GraphPath
-
+#NATIVE PYTHON IMPORTS
 from abc import ABC, abstractmethod
-from typing import List
 import math
+
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.bad_score_levels import BadScoreLevels
 
 class AbstractScore(ABC):
         
     @abstractmethod
     def specificScore(self, graphPath: object, t: int) -> float:
         pass
-
-    def setAllRVDistributions(self, allRVDistributions) -> None:
+    
+    def setAllRVDistributions(self, allRVDistributions: object) -> None:
         self.allRVDistributions = allRVDistributions
     
     def score(self, graphPath: object, t: int) -> float:

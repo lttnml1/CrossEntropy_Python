@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from __future__ import annotations
 
+#NATIVE PYTHON IMPORTS
 from enum import Enum, auto
 
 class CODE_EFFICIENCIES(Enum):

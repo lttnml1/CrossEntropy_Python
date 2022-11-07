@@ -1,14 +1,13 @@
 #!/usr/bin/env python
-from __future__ import annotations
-
-from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
-
+#NATIVE PYTHON IMPORTS
 from typing_extensions import Self
 import numpy as np
 from abc import abstractmethod
 
-#g=Grid(20,20)
-#g.Grid_constructor()
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.chess_board_position_pair import ChessBoardPositionPair
 
 class Grid:
     #_WIDTH: int

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
-from __future__ import annotations
 
-from ce_python.GraphPath import GraphPath
+#NATIVE PYTHON IMPORTS
+
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
 
 class ScoredGraphPath():
-    def __init__(self, graphPath: GraphPath, score: float):
+    def __init__(self, graphPath, score: float):
         self.graphPath = graphPath
         self.score = score
     def __eq__(self, __o: object) -> bool:

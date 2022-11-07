@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import annotations
 
 class TestConstants:
     C: int = 1 # // 10 was the value that was used in the Python code; all V1...V4 worked fine with C=1; only TSP had better results with C=10, because it is a true hard optiminization problem 

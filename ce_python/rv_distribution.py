@@ -1,19 +1,19 @@
 #!/usr/bin/env python
-from __future__ import annotations
-
-
-from ce_python.CODE_EFFICIENCIES import CODE_EFFICIENCIES
-from ce_python.TestConstants import TestConstants
-from ce_python.GraphPath import GraphPath
-from ce_python.TYPE_OF_RV import TYPE_OF_RV
-from ce_python.AbstractScore import AbstractScore
-
+#NATIVE PYTHON IMPORTS
 from abc import ABC, abstractmethod
 import math
 
+#INSTALLED PACKAGE IMPORTS
+import numpy as np
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.code_efficiencies import CODE_EFFICIENCIES
+from ce_python.scored_graph_path import ScoredGraphPath
+from ce_python.test_constants import TestConstants
+
 class RVDistribution(ABC):
 
-    def __init__(self, scoreObject: object, clazz: str, my_CE_Manager, eTYPE_OF_RV: TYPE_OF_RV):
+    def __init__(self, scoreObject, clazz: str, my_CE_Manager, eTYPE_OF_RV):
         self.scoreObject = scoreObject
         self.clazz = clazz
         self.my_CE_Manager = my_CE_Manager
@@ -22,7 +22,7 @@ class RVDistribution(ABC):
         self.eTYPE_OF_RV = eTYPE_OF_RV
         self.eNEW_CODE = my_CE_Manager.eNEW_CODE
         self.scored_graphpath_samples = []
-        self.rand = None
+        self.rand = np.random.default_rng()
     @abstractmethod
     def initDistribution(self):
         pass
@@ -30,22 +30,22 @@ class RVDistribution(ABC):
     def smoothlyUpdateDistribution(self, alpha: float, scoredSampleParts):
         pass
     @abstractmethod
-    def generateGraphPath(self, nAgent: int) -> GraphPath:
+    def generateGraphPath(self, nAgent: int):
         pass
     @abstractmethod
     def getDest(self) -> int:
         pass
 
-    def score(self, graphPath: GraphPath, t: int):
+    def score(self, graphPath, t: int):
         return self.scoreObject.score(graphPath, t)
     def getScoredGraphPath(self, index: int):
         return self.scored_graphpath_samples[index]
-    """
-    def generateAdversaryObject(self, args = None) -> GraphPath:
+    
+    def generateAdversaryObject(self, args = None):
         if(args):
             raise NotImplementedError("generateAdversaryObject with arguments not implemented")
         return GraphPath_Adversary5_HybridDistrib(self.eTYPE_OF_RV,self.my_CE_Manager.environment, self.my_CE_Manager.myRVDistribution)
-    """
+    
     """
     //Overriden by Ecponentia;RVDistribution
     //Gamma is the  S(a path) = score of a path = cost of path at quantile rho 
@@ -60,7 +60,7 @@ class RVDistribution(ABC):
     def doesBestPathEndAtDestination(self) -> bool:
         b: bool = True
         nDest: int = self.getDest()
-        bestPath: GraphPath = self.getScoredGraphPath(0).graphPath
+        bestPath = self.getScoredGraphPath(0).graphPath
         b = b and (bestPath.get(bestPath.len()-1).pt==nDest)
         return b
     

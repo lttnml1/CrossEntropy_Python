@@ -1,22 +1,24 @@
 #!/usr/bin/env python
-from __future__ import annotations
 
-from ce_python.PathPoint import PathPoint
-from ce_python.ChessBoardPositionPair import ChessBoardPositionPair
-from ce_python.TestConstants import TestConstants
-from ce_python.TYPE_OF_RV import TYPE_OF_RV
-from ce_python.Environment import Environment
-
+#NATIVE PYTHON IMPORTS
 from abc import abstractmethod
 from typing import List
 import re
 import math
 import sys
 
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.path_point import PathPoint
+from ce_python.chess_board_position_pair import ChessBoardPositionPair
+from ce_python.test_constants import TestConstants
+from ce_python.type_of_rv import TYPE_OF_RV
+
 class GraphPath:
 	static_ID: int = 0
-	def __init__ (self, eTYPE_OF_RV, environment: Environment, myRvDistribution = None):
-		self.path: List[PathPoint] = []
+	def __init__ (self, eTYPE_OF_RV, environment: object, myRvDistribution = None):
+		self.path: List[object] = []
 		self.bIsGoodPath = True #false only for ChessBoard path that doesn't reach destination
 		self.sHashID = "" #i.e., unset
 		self.eTYPE_OF_RV = eTYPE_OF_RV
@@ -29,7 +31,7 @@ class GraphPath:
 	# Note: speed setting is for EGO, Adversary#1 will be overwrite this settings
 	# GraphPath(String  str, Environment environment, TYPE_OF_RV eTYPE_OF_RV)
 	@classmethod
-	def from_fixed_path(cls, str, eTYPE_OF_RV, environment) -> GraphPath:
+	def from_fixed_path(cls, str, eTYPE_OF_RV, environment) -> object:
 		graphPath = cls(eTYPE_OF_RV,environment)
 		dTime: float = 0
 		nIndex: int = 0
@@ -59,7 +61,7 @@ class GraphPath:
 		self.sHashID += str(pathPt.pt)+","
 
 	@abstractmethod
-	def getBasePath(self) -> GraphPath:
+	def getBasePath(self) -> object:
 		pass
 	
 	def printMeAsChessboardPath(self, environment, Msg: str = None) -> None:
@@ -226,13 +228,3 @@ class GraphPath:
 			return self.path[0:nPt+1]
 		return self.path
 	
-	@staticmethod
-	def test_class():
-		from ce_python.Grid import Grid
-		e = TYPE_OF_RV.ACCEL_RV
-		env = Environment(Grid(20,20))
-		gp = GraphPath.from_fixed_path("(1,2)(3,4)(4,5)(6,7)",e,env)
-		assert gp.getHashID() == "22,64,85,127,", f"Expected \"22,64,85,127\", got {gp.getHashID()}"
-		assert gp.getUniquePathID() == 0, f"Expected 0, got {gp.getUniquePathID()}"
-		gp.getPathPointByAccel(3,3,3.0)
-		print(gp.len())
