@@ -100,7 +100,7 @@ class CategoricalRVDistribution(RVDistribution):
             unvisitable_from_i = i #same row
             unvisitable_from_j = j+1 #column to right, i.e. right neighbor
             neighbor = self.my_CE_Manager.environment.fromPairToVertex(ChessBoardPositionPair(unvisitable_from_i,unvisitable_from_j))
-            if(_trans_mat[neighbor].size >= 5): _trans_mat[neighbor][4] = 0 #neighbor's #3 (left) neighbor is lastVertexInPath
+            if(_trans_mat[neighbor].size >= 5): _trans_mat[neighbor][4] = 0 #neighbor's #4 (left) neighbor is lastVertexInPath
 
     """
     // ex: vertex.j = 0, i.e., left node, then it has no node to its left on the board

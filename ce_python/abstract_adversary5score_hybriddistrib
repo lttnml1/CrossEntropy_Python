@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+#NATIVE PYTHON IMPORTS
+from enum import Enum, auto
+
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.abstract_score import AbstractScore
+
+"""
+//See "DMV-NL Strategy"-NOTE
+//Hybrid Adversary  score for DMV  (Hybrid = Adversary3's Categorical and  Adversary3's Normal score combined) w/ DMV-NL strategy listed in "DMV-NL Strategy"-NOTE
+// The particular DMV-NL incident dealt with here: "caused by wrong lane change suggestion"
+"""
+
+class Abstract_Adversary5Score_HybridDistrib(AbstractScore): #only extends it so to get access to super.specificScore()
+    class NL_DISTANCE_DESCRIPTOR(Enum):
+        LANE_CHANGE = auto()
+        LANE_CHANGE_WEIGHTED = auto() #// a weighted version - where distance between pert.-path and vanilla-path is weighted based on distance from "accident" -- philosophy: pert.-path=vanilla almost all the time, except for a "slight" perturbation closer to the END
+    
+    eNL_DISTANCE_DESCRIPTOR = NL_DISTANCE_DESCRIPTOR.LANE_CHANGE_WEIGHTED
+
+    SIGMOID_SATURATION_LEVEL = 5
+    
+    def __init__(self, environment, nDest):
+        #no need to call super().__init__() here - base class has no constructor
+        self.environment = environment
+        self.nDest = nDest
+
+
