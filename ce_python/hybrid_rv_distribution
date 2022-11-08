@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+#NATIVE PYTHON IMPORTS
+from typing import List
+
+#INSTALLED PACKAGE IMPORTS
+
+#IMPORTS FROM THIS PACKAGE
+from ce_python.categorical_rv_distribution import CategoricalRVDistribution
+
+class HybridRVDistribution(CategoricalRVDistribution):
+    """
+    // most of the complex code for hybrid can be inherited from Categorical, including trans_mat
+    // matrix size n with speed/accel normal distrib
+    """
+    def __init__(self, nSrc: int, nDest: int, bAllowStutter: bool, scoreObject: 'AbstractScore', clazz: str, eTYPE_OF_RV: 'TYPE_OF_RV', my_CE_Manager: 'CE_Manager') -> None:
+        super().__init__(nSrc, nDest, bAllowStutter, scoreObject, clazz, eTYPE_OF_RV, my_CE_Manager)
+        self.gaussianParameters_grid: List['GaussianParameters'] = []
+
+    def initDistribution(self):
+        #categorical part of distribution
+        return super().initDistribution()
