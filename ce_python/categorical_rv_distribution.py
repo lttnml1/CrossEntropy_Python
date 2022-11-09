@@ -31,7 +31,7 @@ class CategoricalRVDistribution(RVDistribution):
         self.trans_mat[:] = p_ij
 
         self.avoidOffBoardPositions(self.trans_mat)
-        self.avoidObstacles(self.trans_mat)
+        self.avoidObstacles(self.trans_mat, self.my_CE_Manager.environment)
         self.normalizeRowProbabilities(self.trans_mat)
 
         """
@@ -110,15 +110,15 @@ class CategoricalRVDistribution(RVDistribution):
     //	|6|5|7|
     """
     def isOffBoard(self, vertex: int, neighborCode: int) -> bool:
-        chessBoarPositionPair_vertex = self.my_CE_Manager.environment.fromVertexToPair(vertex)
-        if(chessBoarPositionPair_vertex.get_i() == 0):
+        chessBoardPositionPair_vertex = self.my_CE_Manager.environment.fromVertexToPair(vertex)
+        if(chessBoardPositionPair_vertex.get_i() == 0):
             if(neighborCode == 7 or neighborCode == 5 or neighborCode == 6): return True
-        elif(chessBoarPositionPair_vertex.get_i() == self.my_CE_Manager.environment.getBoardHeight() - 1):
+        elif(chessBoardPositionPair_vertex.get_i() == self.my_CE_Manager.environment.getBoardHeight() - 1):
             if(neighborCode == 0 or neighborCode == 1 or neighborCode == 2): return True
         
-        if(chessBoarPositionPair_vertex.get_j() == 0):
+        if(chessBoardPositionPair_vertex.get_j() == 0):
             if(neighborCode == 0 or neighborCode == 4 or neighborCode == 6): return True
-        elif(chessBoarPositionPair_vertex.get_j() == self.my_CE_Manager.environment.getBoardWidth() - 1):
+        elif(chessBoardPositionPair_vertex.get_j() == self.my_CE_Manager.environment.getBoardWidth() - 1):
             if(neighborCode == 2 or neighborCode == 3 or neighborCode == 7): return True
         
         return False
@@ -289,7 +289,7 @@ class CategoricalRVDistribution(RVDistribution):
         if(sum != 0):
             _trans_mat[i] = _trans_mat[i]/sum
             dSum = 0
-            dSumn += np.sum(_trans_mat[i])
+            dSum += np.sum(_trans_mat[i])
             if(abs(dSum - 1) > 0.0001):
                 raise Exception("abs(dSum-1) is too large")
 

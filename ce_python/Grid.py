@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #NATIVE PYTHON IMPORTS
 from typing_extensions import Self
-import numpy as np
 from abc import abstractmethod
+import math
 
 #INSTALLED PACKAGE IMPORTS
+import numpy as np
 
 #IMPORTS FROM THIS PACKAGE
 from ce_python.chess_board_position_pair import ChessBoardPositionPair
@@ -105,7 +106,7 @@ class Grid:
     
     def fromVertexToPair(self, vertex: int) -> ChessBoardPositionPair:
         j: int = vertex % self.getBoardWidth()
-        i: int = vertex / self.getBoardWidth()
+        i: int = math.floor(vertex / self.getBoardWidth())
         return ChessBoardPositionPair(i,j)
     
     def fromPairToVertex(self, pair: ChessBoardPositionPair) -> int:

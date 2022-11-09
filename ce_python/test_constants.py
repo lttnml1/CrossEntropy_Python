@@ -14,7 +14,7 @@ class TestConstants:
     NUM_RV_DISTRIBUTIONS: int = 2
     W: int = 20
     H: int = 20
-    NUMBER_OF_POSSIBLE_MOVES: int = 3
+    NUMBER_OF_POSSIBLE_MOVES: int = 8
     D: int = 5 # // used as number of times (t's) the gamma_t doesn't change (see CETutorial.pdf -- eq. (34))
     
     TIME_EGO_AT_ADV1_POS: float = 8.8

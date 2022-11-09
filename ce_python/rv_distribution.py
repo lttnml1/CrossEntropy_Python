@@ -22,7 +22,7 @@ class RVDistribution(ABC):
         self.eTYPE_OF_RV = eTYPE_OF_RV
         self.eNEW_CODE = my_CE_Manager.eNEW_CODE
         self.scored_graphpath_samples = []
-        self.rand = np.random.default_rng()
+        self.rand = my_CE_Manager.rand
     @abstractmethod
     def initDistribution(self):
         pass
