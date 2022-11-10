@@ -108,7 +108,7 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
                     if(nNumIntersections > 1):
                         return TimePtPack(len(advPathList) * 500, -2)
         if(nNumIntersections == 0):
-            return TimePtPack(len(agentPath)*1000,-1)
+            return TimePtPack(agentPath.len()*1000,-1)
         
         #time Adversary reached this point
         __adv = advPathList[nPtAdv_intersect]

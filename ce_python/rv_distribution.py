@@ -130,7 +130,7 @@ class RVDistribution(ABC):
         try:
             truncated_ret_state_config_samples.sort()
         except:
-            print("You probably have a NaN!")
+            print("You probably have a NaN! or sort() is not implemented correctly")
             for i in range(len(truncated_ret_state_config_samples)):
                 if(math.isnan(truncated_ret_state_config_samples[i].getScore())):
                     print(f" --> truncated_ret_state_config_samples[{i}] is NaN!")
@@ -138,6 +138,7 @@ class RVDistribution(ABC):
         ret_state_config_samples = [None] * nSizeofArray
         for i in range(nSizeofArray):
             ret_state_config_samples[i] = truncated_ret_state_config_samples[i]
+        return ret_state_config_samples
     
     def getGammaIndex(self):
         return self.rho_quantile_idx

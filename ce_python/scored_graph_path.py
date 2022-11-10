@@ -10,17 +10,8 @@ class ScoredGraphPath():
     def __init__(self, graphPath, score: float):
         self.graphPath = graphPath
         self.score = score
-    def __eq__(self, __o: object) -> bool:
-        d: float = self.score - __o.score
-        if(d==0): return True
-        else: return False
     def __lt__(self, __o: object) -> bool:
-        d: float = self.score - __o.score
-        if(d<0): return True
-        else: return False
-    def __gt__(self, __o: object) -> bool:
-        d: float = self.score - __o.score
-        if(d>0): return True
+        if(self.score < __o.score): return True
         else: return False
     def printMe(self, sMsg: str) -> None:
         self.graphPath.printMe(f"{sMsg} score={self.score}:")

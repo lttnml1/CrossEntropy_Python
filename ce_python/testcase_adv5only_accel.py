@@ -2,6 +2,7 @@
 
 #NATIVE PYTHON IMPORTS
 from typing import List
+import math
 
 #INSTALLED PACKAGE IMPORTS
 import numpy as np
@@ -109,17 +110,32 @@ class TestCase_Adv5Only_accel:
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
                 gammas = self.initGammas(nRound, rvDistribution_vanilla, rvDistribution_perturbation)
                 while_cond = True
-                #while(while_cond):
-                if(t == 0): print("Started shortestPath...")
+                while(while_cond):
+                    if(t == 0): print("Started shortestPath...")
 
-                #********************* shortestPath() ***********************
-                _gamma_vanilla = rvDistribution_vanilla.gamma(-1,self.rho_quantile_idx, _N, t)
-                t+=1
-                nRound += 1
+                    #********************* shortestPath() ***********************
+                    _gamma_vanilla = rvDistribution_vanilla.gamma(-1,self.rho_quantile_idx, _N, t)
+                    _gamma_vanilla = self.addToGammas(gammas, _gamma_vanilla, 0)
+                    _gamma_perturbation = rvDistribution_perturbation.gamma(-1, self.rho_quantile_idx, _N, t)
+                    _gamma_perturbation = self.addToGammas(gammas, _gamma_perturbation, 1)
+                    rvDistribution_vanilla.smoothlyUpdateDistribution(TestConstants.ALPHA)
+                    t+=1
+                    while_cond = False
+                #*********************END WHILE
+            #*********************END FOR(nRound)
+        #*********************END FOR(nDataSetIndex)
 
 
 
 
+    def addToGammas(self, gammas, gamma: float, index: int) -> float:
+        SCALE = 100000
+        _gamma = gamma
+        if(_gamma < 0): #truncate to 5 points once it satisfies goal (_gamma < 0)
+            _gamma = round(_gamma, 5)
+        gammas[index].add(_gamma)
+        return _gamma
+    
     def initGammas(self, nRound, rvDistribution_vanilla, rvDistribution_perturbation):
         gammas = [None] * TestCase_Adv5Only_accel.NO_OF_PATHS
         for i in range(TestCase_Adv5Only_accel.NO_OF_PATHS):

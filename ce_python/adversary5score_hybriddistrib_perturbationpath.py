@@ -34,14 +34,14 @@ class Adversary5Score_HybridDistrib_PerturbationPath(Abstract_Adversary5Score_Hy
     """
     def specificScore(self, graphPath: object, t: int) -> float:
         from ce_python.testcase_adv5only_accel import TestCase_Adv5Only_accel
-        egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egopath, graphPath) #time diff of point it intersects ego's path w.r.t. when ego gets there
+        egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath, graphPath) #time diff of point it intersects ego's path w.r.t. when ego gets there
         egoToAdv5TimeDiff = egoToAdv5TimeDiffPack.dTime
         ptX = egoToAdv5TimeDiffPack.ptX
         truncatedPath = None
         #calc truncated Perturbation path that ends in "accident" point
         #this facilitated the generation of a high-varince data-set that is based only on the part of the perturbation path UNITL the "accident"
         if(ptX >= 0):
-            truncatedPath = graphPath.truncateAfterPoint(ptX)
+            truncatedPath = graphPath.truncatePathAfterPoint(ptX)
             graphPath.__class__ = GraphPath_Adversary5_HybridDistrib
             graphPath.setTruncatedPath(truncatedPath) #remember the truncated path prefix
         bestVanillaScoredGraphPath = None
