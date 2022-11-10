@@ -40,7 +40,7 @@ class TestCase_Adv5Only_accel:
     # *****************************
 
     NO_OF_PATHS = 2 #vanilla and perturbation
-    DATA_SET_SIZE = 7
+    DATA_SET_SIZE = 1
 
     def __init__(self):
         self.grid = Grid(TestConstants.W, TestConstants.H)
@@ -105,8 +105,19 @@ class TestCase_Adv5Only_accel:
         for nDataSetIndex in range(TestCase_Adv5Only_accel.DATA_SET_SIZE):
             t: int = 0
             for nRound in range(1):
+                
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
                 gammas = self.initGammas(nRound, rvDistribution_vanilla, rvDistribution_perturbation)
+                while_cond = True
+                #while(while_cond):
+                if(t == 0): print("Started shortestPath...")
+
+                #********************* shortestPath() ***********************
+                _gamma_vanilla = rvDistribution_vanilla.gamma(-1,self.rho_quantile_idx, _N, t)
+                t+=1
+                nRound += 1
+
+
 
 
     def initGammas(self, nRound, rvDistribution_vanilla, rvDistribution_perturbation):

@@ -9,7 +9,7 @@ from ce_python.type_of_rv import TYPE_OF_RV
 from ce_python.point_pair import PointPair
 
 class FixedPaths:
-    egoPath = None
+    egoPath: GraphPath_Ego = None
 
     @staticmethod
     def genEgoPath(environment) -> None:
@@ -31,7 +31,7 @@ class FixedPaths:
 			"(0,3)" + \
 			"(0,2)" + \
 			"(0,1)" 
-        egoPath = GraphPath_Ego.from_fixed_path(path_str, TYPE_OF_RV.SPEED_RV, environment)
+        FixedPaths.egoPath = GraphPath_Ego.from_fixed_path(path_str, TYPE_OF_RV.SPEED_RV, environment)
     
     @staticmethod
     def findMeetPoints(adversary1_seq, adversary2_seq):

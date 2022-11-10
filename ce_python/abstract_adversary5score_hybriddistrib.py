@@ -98,7 +98,7 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
         #find ptX the (first) point of intersection.  If there is no such point, then ptX = -1
         for nPtAdv in range(len(advPathList)):
             ptAdv = advPathList[nPtAdv].pt
-            for nPtEgo in range(len(agentPath)):
+            for nPtEgo in range(agentPath.len()):
                 ptEgo = agentPath.getPoint(nPtEgo)
                 if(ptEgo == ptAdv): #this is ptX
                     ptX_ret = ptAdv
@@ -112,7 +112,7 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
         
         #time Adversary reached this point
         __adv = advPathList[nPtAdv_intersect]
-        agentPoint = agentPath[nPtEgo_intersect]
+        agentPoint = agentPath.get(nPtEgo_intersect)
 
         return TimePtPack(abs(__adv.time - agentPoint.time), ptX_ret)
 

@@ -49,7 +49,8 @@ class HybridRVDistribution(CategoricalRVDistribution):
         for nPt in range(path.len()):
             pt = path.getPoint(nPt)
             gaussianParams = self.gaussianParameters_grid[pt]
-            dSpeedOrAccel = HybridRVDistribution.__genRandomSpeedOrAccel(path, nPt, pt, eTYPE_OF_RV, gaussianParams, self.rand)
+            dSpeedOrAccel = HybridRVDistribution.__genRandomSpeedOrAccel(path, nPt, pt, self.eTYPE_OF_RV, gaussianParams, self.rand)
+        return path
     
     @staticmethod 
     def __genRandomSpeedOrAccel(path, nPtIndex, pt, eTYPE_OF_RV, gaussianParams, rand):

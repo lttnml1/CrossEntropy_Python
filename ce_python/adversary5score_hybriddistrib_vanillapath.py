@@ -24,7 +24,7 @@ class Adversary5Score_HybridDistrib_VanillaPath(Abstract_Adversary5Score_HybridD
     
     def specificScore(self, graphPath: object, t: int) -> float:
         dRetDistanceFromPerturbed = 0
-        egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath)
+        egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath, graphPath)
         egoToAdv5TimeDiff = egoToAdv5TimeDiffPack.dTime
         ptX = egoToAdv5TimeDiffPack.ptX
         

@@ -67,12 +67,14 @@ class CategoricalRVDistribution(RVDistribution):
             unvisitable_from_i = i-1 #row below i
             unvisitable_from_j = j #same column
             neighbor = self.my_CE_Manager.environment.fromPairToVertex(ChessBoardPositionPair(unvisitable_from_i,unvisitable_from_j))
-            if(_trans_mat[neighbor].size >= 2): _trans_mat[neighbor][1] = 0 #neighbor's #1 (top) neighbor is lastVertexInPath
+            if(_trans_mat[neighbor].size >= 2): 
+                _trans_mat[neighbor][1] = 0 #neighbor's #1 (top) neighbor is lastVertexInPath
             
             if(j>0):
                 unvisitable_from_j = j-1 #column to left, i.e. bottom left neighbor
                 neighbor = self.my_CE_Manager.environment.fromPairToVertex(ChessBoardPositionPair(unvisitable_from_i,unvisitable_from_j))
-                if(_trans_mat[neighbor].size >= 3): _trans_mat[neighbor][2] = 0 #neighbor's #2 (top-right) neighbor is lastVertexInPath
+                if(_trans_mat[neighbor].size >= 3): 
+                    _trans_mat[neighbor][2] = 0 #neighbor's #2 (top-right) neighbor is lastVertexInPath
             if(j<self.my_CE_Manager.environment.getBoardWidth()-1):
                 unvisitable_from_j = j+1 #column to right, i.e. bottom right neighbor
                 neighbor = self.my_CE_Manager.environment.fromPairToVertex(ChessBoardPositionPair(unvisitable_from_i,unvisitable_from_j))
@@ -81,7 +83,8 @@ class CategoricalRVDistribution(RVDistribution):
             unvisitable_from_i = i+1 #row above i
             unvisitable_from_j = j #same column
             neighbor = self.my_CE_Manager.environment.fromPairToVertex(ChessBoardPositionPair(unvisitable_from_i,unvisitable_from_j))
-            if(_trans_mat[neighbor].size >= 6): _trans_mat[neighbor][5] = 0 #neighbor's #5 (bottom) neighbor is lastVertexInPath
+            if(_trans_mat[neighbor].size >= 6): 
+                _trans_mat[neighbor][5] = 0 #neighbor's #5 (bottom) neighbor is lastVertexInPath
             
             if(j>0):
                 unvisitable_from_j = j-1 #column to left, i.e. top left neighbor
@@ -216,7 +219,7 @@ class CategoricalRVDistribution(RVDistribution):
             lastVertexInPath = path.getPoint(path.len()-1)
             choice = self.chooseNextVertex(_trans_mat,path)
             if(choice == -1):
-                path.setNotgoodPath()
+                path.setNotGoodPath()
                 break
             if(self.isOffBoard(lastVertexInPath,choice)):
                 raise Exception("choice should not point to an offBoard neighbor;  _trans_mat[lastVertexInPath][choice] s.b. 0!")
@@ -275,7 +278,7 @@ class CategoricalRVDistribution(RVDistribution):
 
     def normalizeRowProbabilities(self, _trans_mat, path=None) -> None:
         if(path):
-            i = path.getPoint(len(path)-1)
+            i = path.getPoint(path.len()-1)
             self.norm(_trans_mat, i)
         else:
             for i in range(self.n):
@@ -302,8 +305,14 @@ class CategoricalRVDistribution(RVDistribution):
             raise Exception("chooseNextVertex sanity test failed")
         
         #here we want to return an integer (i.e., 0 through 7) with the next choice of point to go to next
-        choice = self.rand.choice(8, p=_trans_mat[lastVertexInPath])
-        return choice
+        probs = _trans_mat[lastVertexInPath]
+        sum = np.sum(probs)
+        if(sum == 0):
+            return -1
+        else:
+            return self.rand.choice(self.m, p=probs)
+        
+        
     
     def smoothlyUpdateDistribution(self, alpha: float, scoredGraphPaths):
         self.trans_mat_old = self.deepCloneTransMat()

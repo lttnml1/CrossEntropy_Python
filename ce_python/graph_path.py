@@ -55,10 +55,22 @@ class GraphPath:
 			nIndex += 1
 		return graphPath
 	
-	def append(self, indexInPath: int, pt: int, time: float, speed: float):
-		pathPt = PathPoint(indexInPath, pt, time, speed)
-		self.path.append(pathPt)
-		self.sHashID += str(pathPt.pt)+","
+	#def append(self, pathPt = None, indexInPath: int = None, pt: int = None, time: float = None, speed: float = None):
+	def append(self, *args):
+		if(len(args) == 1):
+			pathPt = args[0]
+			self.path.append(pathPt)
+			self.sHashID += str(pathPt.pt)+","
+		elif(len(args) == 4):
+			indexInPath = args[0]
+			pt = args[1]
+			time = args[2]
+			speed = args[3]
+			pathPt = PathPoint(indexInPath, pt, time, speed)
+			self.path.append(pathPt)
+			self.sHashID += str(pathPt.pt)+","
+		else:
+			raise Exception("Incorrect number of args in graph_path.append()")
 
 	@abstractmethod
 	def getBasePath(self) -> object:
@@ -113,8 +125,13 @@ class GraphPath:
 		newPointObject: PathPoint = PathPoint(indexInPath, pt, dThisPtTime, newSpeed, accel)
 		return newPointObject
 	
-	def putPointAt(self, indexInPath: int, pt: int, speedOrAccel: float):
-		eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV # // is speedOrAccel speed or acceleration?
+	def putPointAt(self, indexInPath: int, pt: int, speedOrAccel: float, __eTYPE_OF_RV = None):
+		eTYPE_OF_RV = None
+		if(__eTYPE_OF_RV is None):
+			eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV # // is speedOrAccel speed or acceleration?
+		else: eTYPE_OF_RV = __eTYPE_OF_RV
+
+		newPointObject = None
 		if(eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV):
 			newPointObject = self.getPathPointBySpeed(indexInPath, pt, speedOrAccel)
 		elif(eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV):

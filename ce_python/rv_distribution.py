@@ -10,6 +10,7 @@ import numpy as np
 from ce_python.code_efficiencies import CODE_EFFICIENCIES
 from ce_python.scored_graph_path import ScoredGraphPath
 from ce_python.test_constants import TestConstants
+from ce_python.graph_path_adversary5_hybriddistrib import GraphPath_Adversary5_HybridDistrib
 
 class RVDistribution(ABC):
 
@@ -120,7 +121,7 @@ class RVDistribution(ABC):
             else:
                 _retArray[nextIndex] = new_scoredGraphPath
                 nextIndex += 1
-                if(worst == None or not self.newScoreIsBette(new_scoredGraphPath.getScore(),worst.getScore())):
+                if(worst == None or not self.newScoreIsBetter(new_scoredGraphPath.getScore(),worst.getScore())):
                     worst = new_scoredGraphPath #keep worst path so far
         # new truncate and sort _retPaths to its effetive size and sort
         truncated_ret_state_config_samples = [None] * nextIndex
