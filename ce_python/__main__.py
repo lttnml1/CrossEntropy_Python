@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 
 #NATIVE PYTHON IMPORTS
+import time
 
 #INSTALLED PACKAGE IMPORTS
 
 #IMPORTS FROM THIS PACKAGE
-from ce_python.bad_score_levels import BadScoreLevels
+
 
 if __name__ == '__main__':
-    
-    print(BadScoreLevels.SPECIFIC_LEVEL_1)
+    from ce_python.testcase_adv5only_accel import TestCase_Adv5Only_accel
+
+    start_time = time.time()
+    TestCase_Adv5Only_accel.test_class()
+
+    seconds = time.time() - start_time
+    print(f"For a data set of size: {TestCase_Adv5Only_accel.DATA_SET_SIZE}, Time Taken: {time.gmtime(seconds)}")

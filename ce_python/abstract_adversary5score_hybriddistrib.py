@@ -116,11 +116,11 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
 
         return TimePtPack(abs(__adv.time - agentPoint.time), ptX_ret)
 
-    def calcpathToPathDistance(self, perturbedPath, vanillaPath, bIsBestPerturbedPath) -> float:
-        perturbedPath.__class__ = GraphPath_Adversary5_HybridDistrib
+    def calcPathToPathDistance(self, perturbedPath, vanillaPath, bIsBestPerturbedPath) -> float:
+        #perturbedPath.__class__ = GraphPath_Adversary5_HybridDistrib
         # ^^^ Python cannot "cast" so change the name of the class explicitly from superclass: GraphPath to sublcass: GraphPath_Adversary5_HybridDistrib
         truncatedPerturbedPath = perturbedPath.getTruncatedPath()
-        if(bIsBestPerturbedPath and truncatedPerturbedPath == None):
+        if(bIsBestPerturbedPath and len(truncatedPerturbedPath) == 0):
             raise Exception("No truncatedPerturbedPath (i.e., no accident with Ego) found for best(!) perturbation path")
         if self.eNL_DISTANCE_DESCRIPTOR == NL_DISTANCE_DESCRIPTOR.LANE_CHANGE:
             return self.calcPathToPathLaneDistance(truncatedPerturbedPath, vanillaPath)
@@ -142,11 +142,11 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
     //		weights should make deviations (part. vs vanilla) that are father away from "Accident" cost more, and only as pert. approaches
     // 		its end ("accident") weight go down because that is where we want to allow deviation
     """
-    def calcpathToPathLaneDistance_weighted(self, truncatedPerturbedPath, vanillaPath):
+    def calcPathToPathLaneDistance_weighted(self, truncatedPerturbedPath, vanillaPath):
         return self.calcPTPLD(truncatedPerturbedPath, vanillaPath, True)
     
     def calcPTPLD(self, truncatedPerturbedPath, vanillaPath, bWeighted: bool) -> float:
-        if(truncatedPerturbedPath == None): #no "accident" or ego and this pert.-path was found
+        if(len(truncatedPerturbedPath) == 0): #no "accident" or ego and this pert.-path was found
             return -1
         dDistance = 0
         dSpeedAccelDiff = 0
@@ -174,7 +174,7 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
             // rather, suppose pert.-path has small overall acceleration DELTA  the time DELTA might be much larger (than when using time DELTA verbatim) yet one can argue that pert. is a slight perturbation (in accel, as well as position) of vanilla
             // be impacted more than if I 
             """
-            _d = truncatedPerturbedPath[nPt].speedOrAccel - vanillaPath[nPt].speedOrAccel
+            _d = truncatedPerturbedPath[nPt].speedOrAccel - vanillaPath.get(nPt).speedOrAccel
             #DELTA (see comment above)
             if(bWeighted): _d = _d * (_n-nPt)
             dSpeedAccelDiff += _d

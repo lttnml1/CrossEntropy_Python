@@ -106,24 +106,39 @@ class TestCase_Adv5Only_accel:
         for nDataSetIndex in range(TestCase_Adv5Only_accel.DATA_SET_SIZE):
             t: int = 0
             for nRound in range(1):
-                
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
                 gammas = self.initGammas(nRound, rvDistribution_vanilla, rvDistribution_perturbation)
+                
                 while_cond = True
                 while(while_cond):
+                    
                     if(t == 0): print("Started shortestPath...")
-
                     #********************* shortestPath() ***********************
                     _gamma_vanilla = rvDistribution_vanilla.gamma(-1,self.rho_quantile_idx, _N, t)
                     _gamma_vanilla = self.addToGammas(gammas, _gamma_vanilla, 0)
                     _gamma_perturbation = rvDistribution_perturbation.gamma(-1, self.rho_quantile_idx, _N, t)
                     _gamma_perturbation = self.addToGammas(gammas, _gamma_perturbation, 1)
-                    rvDistribution_vanilla.smoothlyUpdateDistribution(TestConstants.ALPHA)
+
+                    rvDistribution_vanilla.smoothlyUpdateDistributions(TestConstants.ALPHA)
+                    rvDistribution_perturbation.smoothlyUpdateDistributions(TestConstants.ALPHA)
+
+                    print(f"t={t};_gamma_vanilla={_gamma_vanilla};_gamma_perturbation={_gamma_perturbation}")
+
+                    bSomeAreTrue = False
+                    for i in range(self.NO_OF_PATHS):
+                        while_cond_array[i] = while_cond_array[i] and CE_Manager.updateWhileCond(t, nRound, gammas[i], rvDistribution_vanilla.getD())
+                        if(while_cond_array[i]): bSomeAreTrue = True
+                    if(not bSomeAreTrue): while_cond = False
+                    #while_cond = False
                     t+=1
-                    while_cond = False
                 #*********************END WHILE
             #*********************END FOR(nRound)
+
+            #******** experimenting with getting a higher variance data-set
+
         #*********************END FOR(nDataSetIndex)
+
+        print("TestCase End")
 
 
 
@@ -152,5 +167,3 @@ class TestCase_Adv5Only_accel:
     def test_class():
         test = TestCase_Adv5Only_accel()
         test.sanityTestCase_forMatt()
-
-TestCase_Adv5Only_accel.test_class()

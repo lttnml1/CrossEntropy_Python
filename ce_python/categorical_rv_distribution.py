@@ -159,7 +159,7 @@ class CategoricalRVDistribution(RVDistribution):
             if(__j_prime == __j): return 1
             if(__j_prime == __j-1): return 0
             raise Exception(f"j_as_full_index(\"{j_as_full_index}\") is not neighbor of i (\"{i}\")")
-        if(__i_prime == i-1):
+        if(__i_prime == __i-1):
             if(__j_prime == __j + 1): return 7
             if(__j_prime == __j):
                 if(not self.getALLOW_STUTTER()): return 5

@@ -86,7 +86,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
                 if(pathPoint is None):
                     dSum += 0
                 else:
-                    dSum += pathPoint.SpeedOrAccel
+                    dSum += pathPoint.speedOrAccel
             mu = dSum/len(scoredGraphPaths)
             """
             //if no path affected cell i then retain its distrib -- don't change it from initial random assignment (do not set to 0 because that will lead to paths discovered later using 0 speed instead of the default/initially-set speed
@@ -98,7 +98,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
             dSum = 0
             for j in range(len(scoredGraphPaths)):
                 speedSequence = scoredGraphPaths[j].graphPath
-                pathPoint = speedSequence.getSpeedAtGridPoint(i)
+                pathPoint = speedSequence.getSpeedPointAtGridPoint(i)
                 if(pathPoint == None):
                     d = 0
                 else:
@@ -108,6 +108,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
             var = dSum/len(scoredGraphPaths)
             sigma = math.sqrt(var)
             if(dSum == 0):
+                neighborMuGaussianParameters = self.getNeighborGaussianParameters(i) #added this line, otherwise, get DivByZero Error in averageFromNeighbors b/c len(neighborsGaussianParameters) == 0
                 mu = self.averageFromNeighbors(neighborMuGaussianParameters, False)
             #Smoothing
             _newGaussianParameters = self.gaussianParameters_grid[i]

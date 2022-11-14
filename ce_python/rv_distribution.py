@@ -27,9 +27,11 @@ class RVDistribution(ABC):
     @abstractmethod
     def initDistribution(self):
         pass
+    """
     @abstractmethod
     def smoothlyUpdateDistribution(self, alpha: float, scoredSampleParts):
         pass
+    """
     @abstractmethod
     def generateGraphPath(self, nAgent: int):
         pass
@@ -182,6 +184,8 @@ class RVDistribution(ABC):
     def getD(self) -> int:
         return TestConstants.D
     
-    def smoothlyUpdateDistributions(self, alpha: float) -> None:
-        _highScoredPaths = self.highScoredPaths()
+    def smoothlyUpdateDistributions(self, alpha: float, scoredSampleParts = None) -> None:
+        if scoredSampleParts is None:
+            _highScoredPaths = self.highScoredPaths()
+        else: _highScoredPaths = scoredSampleParts
         self.smoothlyUpdateDistribution(alpha, _highScoredPaths)

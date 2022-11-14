@@ -20,7 +20,7 @@ class Adversary5Score_HybridDistrib_VanillaPath(Abstract_Adversary5Score_HybridD
         self.rvDistributions_perturbed = None
     
     def setPerturbedDistribution(self, rvDistributions_perturbed):
-        self.rvDistrubutions_perturbed = rvDistributions_perturbed
+        self.rvDistributions_perturbed = rvDistributions_perturbed
     
     def specificScore(self, graphPath: object, t: int) -> float:
         dRetDistanceFromPerturbed = 0
@@ -31,7 +31,7 @@ class Adversary5Score_HybridDistrib_VanillaPath(Abstract_Adversary5Score_HybridD
         dRetDistanceFromPerturbed = 1000 #just penalty for being round 0 and not having this.rvDistributions_vanilla yet
         if(t>0):
             bestPerturbedScoredGraphPath = self.rvDistributions_perturbed.getScoredGraphPath(0).graphPath
-            dDistance = self.calcpathToPathDistance(graphPath, bestPerturbedScoredGraphPath, True) #distance between this and vanilla -- smaller is better, and the intersection point
+            dDistance = self.calcPathToPathDistance(bestPerturbedScoredGraphPath, graphPath, True) #distance between this and vanilla -- smaller is better, and the intersection point
             if(dDistance == 0):
                 dRetDistanceFromPerturbed = BadScoreLevels.BAD_PATH #dDistance=0  happens when bestVanillaScoredGraphPath and graphPath are same path - that is a violation of a rigid constraint for the paired <vanilla/perturbation> approach (the two HAVE to be different, otherwise how would one be good while the other is bad?)
             else:

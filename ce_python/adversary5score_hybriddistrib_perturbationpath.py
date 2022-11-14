@@ -48,7 +48,7 @@ class Adversary5Score_HybridDistrib_PerturbationPath(Abstract_Adversary5Score_Hy
         dRetDistanceFromVanilla = 1000 #just penalty for being round 0 and not having this.rvDistributions_vanilla yet
         if(t>0):
             bestVanillaScoredGraphPath = self.rvDistributions_vanilla.getScoredGraphPath(0).graphPath
-            dDistance = self.calcpathToPathDistance(graphPath, bestVanillaScoredGraphPath, False) #distance between this and vanilla -- smaller is better, and the intersection point
+            dDistance = self.calcPathToPathDistance(graphPath, bestVanillaScoredGraphPath, False) #distance between this and vanilla -- smaller is better, and the intersection point
             if(dDistance <= 0):
                 dRetDistanceFromVanilla = BadScoreLevels.BAD_PATH #dDistance=0  happens when bestVanillaScoredGraphPath and graphPath are same path - that is a violation of a rigid constraint for the paired <vanilla/perturbation> approach (the two HAVE to be different, otherwise how would one be good while the other is bad?)
             else:

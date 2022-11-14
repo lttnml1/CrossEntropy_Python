@@ -131,8 +131,9 @@ class CE_Manager:
         if(t < _d):
             while_cond_retval =  True
         # if the previous d gamm are the same, exit the while-loop:
-        else: #if (gammas[-this.d:] == [gammas[-1]] * this.d)
-            bAllAreEqual = (gammas[-_d:] == [gammas[-1]] * _d)
+        else: #if (gammas[-this.d] == ([gammas[-1]] * this.d))
+            aGammas = gammas.gammas
+            bAllAreEqual = (aGammas[-_d] == ([aGammas[-1]] * _d))
             if(bAllAreEqual):
                 while_cond_retval = False
         return while_cond_retval
