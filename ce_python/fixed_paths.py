@@ -11,6 +11,8 @@ from ce_python.point_pair import PointPair
 class FixedPaths:
     egoPath: GraphPath_Ego = None
 
+    
+
     @staticmethod
     def genEgoPath(environment) -> None:
         path_str = "(6,17)" + \
@@ -31,7 +33,27 @@ class FixedPaths:
 			"(0,3)" + \
 			"(0,2)" + \
 			"(0,1)" 
-        FixedPaths.egoPath = GraphPath_Ego.from_fixed_path(path_str, TYPE_OF_RV.SPEED_RV, environment)
+        path_str2 = \
+            "(0,12)" + \
+            "(1,12)" + \
+			"(2,12)" + \
+			"(3,12)" + \
+			"(4,12)" + \
+			"(5,12)" + \
+			"(6,12)" + \
+			"(7,12)" + \
+			"(8,12)" + \
+			"(9,12)" + \
+			"(10,12)" + \
+			"(11,12)" + \
+			"(12,12)" + \
+			"(13,12)" + \
+			"(14,12)" + \
+			"(15,12)" + \
+			"(16,12)" + \
+			"(17,12)" + \
+			"(18,12)"
+        FixedPaths.egoPath = GraphPath_Ego.from_fixed_path(path_str2, TYPE_OF_RV.SPEED_RV, environment)
     
     @staticmethod
     def findMeetPoints(adversary1_seq, adversary2_seq):

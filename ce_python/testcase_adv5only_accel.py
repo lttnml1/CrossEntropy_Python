@@ -42,7 +42,7 @@ class TestCase_Adv5Only_accel:
     # *****************************
 
     NO_OF_PATHS = 2 #vanilla and perturbation
-    DATA_SET_SIZE = 1
+    DATA_SET_SIZE = 100
 
     def __init__(self):
         self.grid = Grid(TestConstants.W, TestConstants.H)
@@ -63,8 +63,8 @@ class TestCase_Adv5Only_accel:
 
         FixedPaths.genEgoPath(self.environment)
 
-        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,17))
-        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,14))
+        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,15))
+        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,9))
     
     #This test just find a shortest path to see that CE works ok
     def sanityTestCase_forMatt(self):
@@ -173,6 +173,9 @@ class TestCase_Adv5Only_accel:
             TestCase_Adv5Only_accel.write_path_to_file(last_bestScoredGraphPath_perturbation.graphPath.path,f"{nDataSetIndex}_perturbed.txt")
             TestCase_Adv5Only_accel.write_path_to_file(last_bestScoredGraphPath_vanilla.graphPath.path,f"{nDataSetIndex}_vanilla.txt")
 
+            #write variances to file
+            TestCase_Adv5Only_accel.write_variances_to_file(nDataSetIndex, TestCase_Adv5Only_accel.dVarNormal, TestCase_Adv5Only_accel.dVarCategorical)
+
 
 
 
@@ -215,6 +218,17 @@ class TestCase_Adv5Only_accel:
         with open(full_path,'w') as file:
             for point in car_path:
                 file.write(f"{point.indexInPath},{point.pt},{point.speed}\n")
+    
+    @staticmethod
+    def write_variances_to_file(index, norm, cat):
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","data/"))
+        full_path = os.path.join(path,"VARIANCES.txt")
+        with open(full_path,'a+') as file:
+            if(index == 0):
+                file.write("INDEX, NORMAL_VARIANCE, CATEGORICAL_VARIANCE\n")
+            file.write(f"{index},{norm},{cat}\n")
+
+
     
     @staticmethod
     def test_class():
