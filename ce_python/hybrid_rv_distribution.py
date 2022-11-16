@@ -50,6 +50,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
             pt = path.getPoint(nPt)
             gaussianParams = self.gaussianParameters_grid[pt]
             dSpeedOrAccel = HybridRVDistribution.__genRandomSpeedOrAccel(path, nPt, pt, self.eTYPE_OF_RV, gaussianParams, self.rand)
+            path.updatePointAt(nPt,pt,dSpeedOrAccel, self.eTYPE_OF_RV)
         return path
     
     @staticmethod 
@@ -108,7 +109,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
             var = dSum/len(scoredGraphPaths)
             sigma = math.sqrt(var)
             if(dSum == 0):
-                neighborMuGaussianParameters = self.getNeighborGaussianParameters(i) #added this line, otherwise, get DivByZero Error in averageFromNeighbors b/c len(neighborsGaussianParameters) == 0
+                #neighborMuGaussianParameters = self.getNeighborGaussianParameters(i) #added this line, otherwise, get DivByZero Error in averageFromNeighbors b/c len(neighborsGaussianParameters) == 0
                 mu = self.averageFromNeighbors(neighborMuGaussianParameters, False)
             #Smoothing
             _newGaussianParameters = self.gaussianParameters_grid[i]
@@ -127,9 +128,14 @@ class HybridRVDistribution(CategoricalRVDistribution):
 
     def averageFromNeighbors(self, neighborsGaussianParameters, calculateMU: bool) -> float:
         dSum = 0
+        ret = 0
         for gaussianParameters in neighborsGaussianParameters:
             if(calculateMU):
                 dSum += gaussianParameters.mu
             else:
                 dSum += gaussianParameters.sigma
-        return dSum/len(neighborsGaussianParameters)
+        try:
+            ret = dSum/len(neighborsGaussianParameters)
+        except ZeroDivisionError:
+            ret = math.nan
+        return ret

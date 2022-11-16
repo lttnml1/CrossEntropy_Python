@@ -140,8 +140,13 @@ class GraphPath:
 			raise Exception("Unrecognized eTYPE_OF_RV in putPointAt()")
 		self.append(newPointObject)
 	
-	def updatePointAt(self, indexInPath: int, pt: int, speedOrAccel: float):
-		eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV
+	def updatePointAt(self, indexInPath: int, pt: int, speedOrAccel: float, __eTYPE_OF_RV = None):
+		eTYPE_OF_RV = None
+		if __eTYPE_OF_RV is None:
+			eTYPE_OF_RV: TYPE_OF_RV = self.eTYPE_OF_RV
+		else: eTYPE_OF_RV = __eTYPE_OF_RV
+
+
 		if(eTYPE_OF_RV == TYPE_OF_RV.SPEED_RV):
 			newPointObject = self.getPathPointBySpeed(indexInPath, pt, speedOrAccel)
 		elif(eTYPE_OF_RV == TYPE_OF_RV.ACCEL_RV):

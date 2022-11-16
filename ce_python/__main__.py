@@ -10,9 +10,11 @@ import time
 
 if __name__ == '__main__':
     from ce_python.testcase_adv5only_accel import TestCase_Adv5Only_accel
-
-    start_time = time.time()
-    TestCase_Adv5Only_accel.test_class()
-
-    seconds = time.time() - start_time
-    print(f"For a data set of size: {TestCase_Adv5Only_accel.DATA_SET_SIZE}, Time Taken: {time.gmtime(seconds)}")
+    try:
+        start_time = time.time()
+        TestCase_Adv5Only_accel.test_class()
+    except KeyboardInterrupt:
+        print("User interrupted by keyboard")
+    finally:
+        seconds = time.time() - start_time
+        print(f"For a data set of size: {TestCase_Adv5Only_accel.DATA_SET_SIZE}, Time Taken: {time.strftime('%H:%M:%S',time.gmtime(seconds))}")

@@ -24,7 +24,7 @@ class Grid:
 
     def Grid_constructor(self) -> None:
         #all values already initialized to ones in constructor: "np.ones..."
-
+        """
         #cone
         self._grid[3:7,13:17] = 0
 
@@ -69,7 +69,7 @@ class Grid:
 
         np.set_printoptions(linewidth=np.inf)
         #print(self._grid)
-
+        """
         #**DID NOT IMPLEMENT the section for: //***When height > 20 then add more obstacles
     
     def getGrid(self) -> np.ndarray:

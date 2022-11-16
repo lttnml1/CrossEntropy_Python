@@ -3,6 +3,7 @@
 #NATIVE PYTHON IMPORTS
 from typing import List
 import math
+import os
 
 #INSTALLED PACKAGE IMPORTS
 import numpy as np
@@ -62,8 +63,8 @@ class TestCase_Adv5Only_accel:
 
         FixedPaths.genEgoPath(self.environment)
 
-        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,2))
-        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,17))
+        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,17))
+        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,14))
     
     #This test just find a shortest path to see that CE works ok
     def sanityTestCase_forMatt(self):
@@ -104,6 +105,7 @@ class TestCase_Adv5Only_accel:
         last_bestScoredGraphPath_perturbation = None
 
         for nDataSetIndex in range(TestCase_Adv5Only_accel.DATA_SET_SIZE):
+            print(f"DATA_SET: {nDataSetIndex+1}/{TestCase_Adv5Only_accel.DATA_SET_SIZE}")
             t: int = 0
             for nRound in range(1):
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
@@ -135,8 +137,51 @@ class TestCase_Adv5Only_accel:
             #*********************END FOR(nRound)
 
             #******** experimenting with getting a higher variance data-set
+            _bestScoredGraphPath_perturbation: 'ScoredGraphPath' = rvDistribution_perturbation.getScoredGraphPath(0)
+
+            #//DORON-ASSUMPTION-NOTE: although Categorical is obviously not Normal distrib, I think of the paths that can be discovered using Categorical CE as Normally distributed!\
+            __graphPath: 'GraphPath_Adversary5_HybridDistrib' = _bestScoredGraphPath_perturbation.graphPath
+            dCategoricalPathMeasure: float = __graphPath.getCategoricalPathMeasure(__graphPath.getTruncatedPath())
+            TestCase_Adv5Only_accel.dAvgCategorical = (dCategoricalPathMeasure + TestCase_Adv5Only_accel.dAvgCategorical * TestCase_Adv5Only_accel.nPaths)/(TestCase_Adv5Only_accel.nPaths+1)
+            d: float = abs(dCategoricalPathMeasure - TestCase_Adv5Only_accel.dAvgCategorical)
+            d = d*d
+            TestCase_Adv5Only_accel.dVarCategorical = (d + TestCase_Adv5Only_accel.dVarCategorical * TestCase_Adv5Only_accel.nPaths)/(TestCase_Adv5Only_accel.nPaths+1)
+            TestCase_Adv5Only_accel.dAvgCategorical_minus_2Sigma = TestCase_Adv5Only_accel.dAvgCategorical - 2*math.sqrt(TestCase_Adv5Only_accel.dVarCategorical) #////DORON-ASSUMPTION-NOTE: the cost function goal will be to come as close to mu-2*sigma from above
+
+            dNormalPathMeasure: float = __graphPath.getNormalPathMeasure(__graphPath.getTruncatedPath())
+            TestCase_Adv5Only_accel.dAvgNormal = (dNormalPathMeasure + TestCase_Adv5Only_accel.dAvgNormal * TestCase_Adv5Only_accel.nPaths)/(TestCase_Adv5Only_accel.nPaths+1)
+            d = abs(dNormalPathMeasure - TestCase_Adv5Only_accel.dAvgNormal)
+            d=d*d
+            TestCase_Adv5Only_accel.dVarNormal = (d + TestCase_Adv5Only_accel.dVarNormal * TestCase_Adv5Only_accel.nPaths)/(TestCase_Adv5Only_accel.nPaths+1)
+            TestCase_Adv5Only_accel.dAvgNormal_minus_2Sigma = TestCase_Adv5Only_accel.dAvgNormal - 2*math.sqrt(TestCase_Adv5Only_accel.dVarNormal)
+
+            TestCase_Adv5Only_accel.nPaths += 1
+
+
+            last_bestScoredGraphPath_vanilla = None
+            last_bestScoredGraphPath_perturbation = None
+            if(CE_Manager.isRigidConstraintsSatisfied(rvDistribution_vanilla) and rvDistribution_vanilla.areConstraintsSatisfied()):
+                last_bestScoredGraphPath_vanilla = rvDistribution_vanilla.getScoredGraphPath(0)
+                bestScoredGraphPaths_vanilla.append(last_bestScoredGraphPath_vanilla)
+            if(CE_Manager.isRigidConstraintsSatisfied(rvDistribution_perturbation) and rvDistribution_perturbation.areConstraintsSatisfied()):
+                last_bestScoredGraphPath_perturbation = rvDistribution_perturbation.getScoredGraphPath(0)
+                bestScoredGraphPaths_perturbation.append(last_bestScoredGraphPath_perturbation)
+            assert last_bestScoredGraphPath_perturbation, "last_bestScoredGraphPath_perturbation is None"
+            assert last_bestScoredGraphPath_vanilla, "last_bestScoredGraphPath_vanilla is None"
+
+            #write paths to file
+            TestCase_Adv5Only_accel.write_path_to_file(last_bestScoredGraphPath_perturbation.graphPath.path,f"{nDataSetIndex}_perturbed.txt")
+            TestCase_Adv5Only_accel.write_path_to_file(last_bestScoredGraphPath_vanilla.graphPath.path,f"{nDataSetIndex}_vanilla.txt")
+
+
+
 
         #*********************END FOR(nDataSetIndex)
+
+        if(len(bestScoredGraphPaths_vanilla) > 0 and len(bestScoredGraphPaths_perturbation) > 0):
+            paths = [None] * TestCase_Adv5Only_accel.NO_OF_PATHS
+            paths[0] = last_bestScoredGraphPath_vanilla.graphPath
+            paths[1] = last_bestScoredGraphPath_perturbation.graphPath
 
         print("TestCase End")
 
@@ -162,6 +207,14 @@ class TestCase_Adv5Only_accel:
     
     def getC(self) -> int:
         return TestCase_Adv5Only_accel.C
+
+    @staticmethod
+    def write_path_to_file(car_path, file_name):
+        path = os.path.abspath(os.path.join(os.path.dirname(__file__),"..","data/"))
+        full_path = os.path.join(path,file_name)
+        with open(full_path,'w') as file:
+            for point in car_path:
+                file.write(f"{point.indexInPath},{point.pt},{point.speed}\n")
     
     @staticmethod
     def test_class():

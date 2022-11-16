@@ -116,7 +116,7 @@ class CE_Manager:
         #__rvDistribution.__class__.__name__
     
     @staticmethod
-    def isRigitConstraintsSatisfied(rvDistribution) -> bool:
+    def isRigidConstraintsSatisfied(rvDistribution) -> bool:
         score = rvDistribution.getScoredGraphPath(0).getScore()
         if(score >= 0): return False
         else: return True
@@ -132,8 +132,10 @@ class CE_Manager:
             while_cond_retval =  True
         # if the previous d gamm are the same, exit the while-loop:
         else: #if (gammas[-this.d] == ([gammas[-1]] * this.d))
+            #print(f"t:{t} >= d:{_d}")
             aGammas = gammas.gammas
-            bAllAreEqual = (aGammas[-_d] == ([aGammas[-1]] * _d))
+            bAllAreEqual = (aGammas[-_d:] == ([aGammas[-1]] * _d))
+            #print(f"{aGammas[-_d:]} == {([aGammas[-1]] * _d)}: {bAllAreEqual}")
             if(bAllAreEqual):
                 while_cond_retval = False
         return while_cond_retval
