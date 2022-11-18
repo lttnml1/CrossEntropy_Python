@@ -136,7 +136,7 @@ class World(object):
 
 class Scenario:
     SPEED_FACTOR = 3
-    DEBUG = False
+    DEBUG = True
 
     def __init__(self, file):
         self.file = file
@@ -183,6 +183,8 @@ class Scenario:
             self.world = World(sim_world, grid)
             self.convert_points_to_locations()
             if(Scenario.DEBUG): self.world.draw_grid(draw_time=30)
+
+            #print(self.world._grid.return_location_from_grid(0,0).distance(self.world._grid.return_location_from_grid(1,1)))
 
             # Spawn the actors
             blueprints = self.world.world.get_blueprint_library()
@@ -246,9 +248,23 @@ class Scenario:
         ego_agent = SimpleAgent(self.world.ego, ego_destination_array[ego_dest_index], target_speed=ego_speed_array[ego_dest_index-1])
 
         ego_done = False
+
+        timeout_counter = 0
+        crash_counter = 0
         while True:
             self.world.world.tick()
-            self.get_features()
+
+            if(self.get_features()[2]):
+                crash_counter += 1
+                #print(crash_counter)
+            else: crash_counter = 0
+
+            if(crash_counter > 50):
+                print("Crash")
+                break
+            elif(timeout_counter > 1000):
+                print("Timeout")
+                break
             
             if adversary_agent.done():
                 
@@ -278,6 +294,8 @@ class Scenario:
 
             if(not ego_done):
                 self.world.ego.apply_control(ego_agent.run_step())
+            
+            timeout_counter += 1
     
     def get_features(self):
         frame_feature_vec = []
@@ -285,6 +303,11 @@ class Scenario:
         ego_snapshot = snapshot.find(self.world.ego.id)
         adv_snapshot = snapshot.find(self.world.adversary.id)
         frame_feature_vec.append(snapshot.frame)
+
+        i,j = self.world._grid.return_grid_from_location(adv_snapshot.get_transform().location)
+        adv_point = self.world._grid.return_point_from_coords(i,j)
+        frame_feature_vec.append(adv_point)
+        
 
         (accident,distance,angle) = self.bounding_box_calcs([ego_snapshot, adv_snapshot])
         frame_feature_vec.append(accident)
@@ -356,7 +379,7 @@ class Scenario:
         return angle
     
     def write_features(self):
-        headers = ['frame', 'intersect','distance','angle', 
+        headers = ['frame','adv_point','intersect','distance','angle', 
                    'ego_vel_x','ego_vel_y','ego_vel_z','ego_accel_x','ego_accel_y','ego_accel_z','ego_ang_vel_x','ego_ang_vel_y','ego_ang_vel_z',
                    'adv_vel_x','adv_vel_y','adv_vel_z','adv_accel_x','adv_accel_y','adv_accel_z','adv_ang_vel_x','adv_ang_vel_y','adv_ang_vel_z']
         self.dataframe = pd.DataFrame(data = self.feature_vector, columns=headers)

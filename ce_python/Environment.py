@@ -24,10 +24,14 @@ class Environment():
         next_pos = self.fromVertexToPair(_next_pos)
         len: float = 0
         if(pos.get_i() == next_pos.get_i()):
-            len += 1.0
+            len += 0.367 #1.0
         elif(pos.get_j() == next_pos.get_j()):
-            len += 1.0
-        else: len += 1.4
+            len += 1 #1.0
+        else: len += 1.065 #1.4
         return len
+        #This is the same proportion as the
+        #   sideways: 2.2
+        #   up: 6.0
+        #   diag: 6.39   
         
         

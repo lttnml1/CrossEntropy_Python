@@ -63,8 +63,8 @@ class TestCase_Adv5Only_accel:
 
         FixedPaths.genEgoPath(self.environment)
 
-        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,15))
-        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,9))
+        self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,9))
+        self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,15))
     
     #This test just find a shortest path to see that CE works ok
     def sanityTestCase_forMatt(self):
