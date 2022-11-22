@@ -5,3 +5,4 @@ data/
 features/
 data_archive/
 classifier_data/
+package_test/
