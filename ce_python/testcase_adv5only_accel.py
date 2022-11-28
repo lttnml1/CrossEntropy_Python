@@ -4,6 +4,7 @@
 from typing import List
 import math
 import os
+import time
 
 #INSTALLED PACKAGE IMPORTS
 import numpy as np
@@ -42,7 +43,7 @@ class TestCase_Adv5Only_accel:
     # *****************************
 
     NO_OF_PATHS = 2 #vanilla and perturbation
-    DATA_SET_SIZE = 100
+    DATA_SET_SIZE = 2
 
     def __init__(self):
         self.grid = Grid(TestConstants.W, TestConstants.H)
@@ -65,6 +66,9 @@ class TestCase_Adv5Only_accel:
 
         self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,9))
         self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,15))
+
+        #self.nSrc_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(18,2))
+        #self.nDest_Adversary5: int = self.environment.fromPairToVertex(ChessBoardPositionPair(0,17))
     
     #This test just find a shortest path to see that CE works ok
     def sanityTestCase_forMatt(self):
@@ -98,23 +102,67 @@ class TestCase_Adv5Only_accel:
         scoreObject5_HybridDistribution_PerturbationPath.setVanillaDistribution(rvDistribution_vanilla)
         scoreObject5_HybridDistribution_VanillaPath.setPerturbedDistribution(rvDistribution_perturbation)
 
+
+        #=================
+        # * 11/22/22
         _N: int = N
         bestScoredGraphPaths_vanilla = []
+        first_bestScoredGraphPath_vanilla = None
         last_bestScoredGraphPath_vanilla = None
         bestScoredGraphPaths_perturbation = []
+        first_bestScoredGraphPath_perturbation = None
         last_bestScoredGraphPath_perturbation = None
 
         for nDataSetIndex in range(TestCase_Adv5Only_accel.DATA_SET_SIZE):
             print(f"DATA_SET: {nDataSetIndex+1}/{TestCase_Adv5Only_accel.DATA_SET_SIZE}")
+            start_time = time.time()
+
             t: int = 0
-            for nRound in range(1):
+
+            self.eNEW_CODE = CODE_EFFICIENCIES.NEW_CODE_FAST
+
+            rvDistribution_vanilla.set_eNEW_CODE(self.eNEW_CODE)
+            rvDistribution_vanilla.set_m(self.m)
+            rvDistribution_vanilla.set_rho_quantile_idx(self.rho_quantile_idx)
+
+            rvDistribution_perturbation.set_eNEW_CODE(self.eNEW_CODE)
+            rvDistribution_perturbation.set_m(self.m)
+            rvDistribution_perturbation.set_rho_quantile_idx(self.rho_quantile_idx)
+
+            numBatches = None
+            if(TestConstants.USE_MULTIPLE_CE_BATCHES): numBatches = TestConstants.NUM_CE_BATCHES
+            else: numBatches = 1
+            for nBatch in range(numBatches):
+                t_batch: int = 0
+                if(TestConstants.USE_MULTIPLE_CE_BATCHES):
+                    if(TestConstants.NUM_CE_BATCHES == 3 and nBatch == 0):
+                        _N = N // TestConstants.BATCH_0_SPEEDUP_FACTOR
+                        self.rho_quantile_idx = _N // 10
+                    elif(nBatch == TestConstants.NUM_CE_BATCHES-1):
+                        _N = N // TestConstants.BATCH_CARLA_SPEEDUP_FACTOR
+                        self.rho_quantile_idx = _N // 10
+                        self.m = TestConstants.CARLA_m
+
+                        self.eNEW_CODE = CODE_EFFICIENCIES.CARLA_CODE
+
+                        rvDistribution_vanilla.set_eNEW_CODE(self.eNEW_CODE)
+                        rvDistribution_vanilla.set_m(self.m)
+                        rvDistribution_vanilla.set_rho_quantile_idx(self.rho_quantile_idx)
+
+                        rvDistribution_perturbation.set_eNEW_CODE(self.eNEW_CODE)
+                        rvDistribution_perturbation.set_m(self.m)
+                        rvDistribution_perturbation.set_rho_quantile_idx(self.rho_quantile_idx)
+
+                    if(self.rho_quantile_idx < 6):
+                        raise Exception(f"self.rho_quantile_idx ({self.rho_quantile_idx}) is too small (less than 10) to gather statistics from")
+
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
-                gammas = self.initGammas(nRound, rvDistribution_vanilla, rvDistribution_perturbation)
+                gammas = self.initGammas(nBatch, rvDistribution_vanilla, rvDistribution_perturbation)
                 
                 while_cond = True
                 while(while_cond):
                     
-                    if(t == 0): print("Started shortestPath...")
+                    if(t_batch == 0): print("Started CE Batch...")
                     #********************* shortestPath() ***********************
                     _gamma_vanilla = rvDistribution_vanilla.gamma(-1,self.rho_quantile_idx, _N, t)
                     _gamma_vanilla = self.addToGammas(gammas, _gamma_vanilla, 0)
@@ -124,17 +172,23 @@ class TestCase_Adv5Only_accel:
                     rvDistribution_vanilla.smoothlyUpdateDistributions(TestConstants.ALPHA)
                     rvDistribution_perturbation.smoothlyUpdateDistributions(TestConstants.ALPHA)
 
-                    print(f"t={t};_gamma_vanilla={_gamma_vanilla};_gamma_perturbation={_gamma_perturbation}")
+                    sBatch = ""
+                    if TestConstants.USE_MULTIPLE_CE_BATCHES:
+                        sBatch = f"nbatch# {nBatch}, "
+                    print(f"{sBatch} t_batch={t_batch}, t={t};_gamma_vanilla={_gamma_vanilla};_gamma_perturbation={_gamma_perturbation}")
 
                     bSomeAreTrue = False
                     for i in range(self.NO_OF_PATHS):
-                        while_cond_array[i] = while_cond_array[i] and CE_Manager.updateWhileCond(t, nRound, gammas[i], rvDistribution_vanilla.getD())
+                        while_cond_array[i] = while_cond_array[i] and CE_Manager.updateWhileCond(t_batch, nBatch, gammas[i], rvDistribution_vanilla.getD())
                         if(while_cond_array[i]): bSomeAreTrue = True
                     if(not bSomeAreTrue): while_cond = False
                     #while_cond = False
                     t+=1
+                    t_batch+=1
+                    if(TestConstants.USE_MULTIPLE_CE_BATCHES and nBatch == TestConstants.NUM_CE_BATCHES-1 and t_batch ==TestConstants.NUM_ROUNDS_IN_CARLA_BATCH):
+                        while_cond = False
                 #*********************END WHILE
-            #*********************END FOR(nRound)
+            #*********************END FOR(nBatch)
 
             #******** experimenting with getting a higher variance data-set
             _bestScoredGraphPath_perturbation: 'ScoredGraphPath' = rvDistribution_perturbation.getScoredGraphPath(0)
@@ -175,6 +229,8 @@ class TestCase_Adv5Only_accel:
 
             #write variances to file
             TestCase_Adv5Only_accel.write_variances_to_file(nDataSetIndex, TestCase_Adv5Only_accel.dVarNormal, TestCase_Adv5Only_accel.dVarCategorical)
+            seconds = time.time() - start_time
+            print(f"nDataSetIndex {nDataSetIndex}: Time: {time.strftime('%H:%M:%S',time.gmtime(seconds))}")
 
 
 
@@ -199,10 +255,10 @@ class TestCase_Adv5Only_accel:
         gammas[index].add(_gamma)
         return _gamma
     
-    def initGammas(self, nRound, rvDistribution_vanilla, rvDistribution_perturbation):
+    def initGammas(self, nBatch, rvDistribution_vanilla, rvDistribution_perturbation):
         gammas = [None] * TestCase_Adv5Only_accel.NO_OF_PATHS
         for i in range(TestCase_Adv5Only_accel.NO_OF_PATHS):
-            if(nRound == 0):
+            if(nBatch == 0):
                 rvDistribution_vanilla.initDistribution()
                 rvDistribution_perturbation.initDistribution()
             gammas[i] = Gammas()

@@ -86,10 +86,18 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
         return dRet
     
     """
+    // * 11/14/22
     // calculate diff time between the arrival of agent-1 (usually ego) at point ptX and adversary  arrivale at ptX, where ptX is the intersection between the two paths
 	// This also implements the rigid constraint that # of intersections with ego is no more than one
+    // NOTE that a diagonal intersection of the two paths doesn't necessarily have a point of intersection but are rather like:
+		//    o x
+		//    x o
+		// In the code I  call this diagonalCross -- see isDiagonalCross()
     """
     def getAgentToAdvTimeDiffPack(self, agentPath, advGraphPath) -> TimePtPack:
+        # // In AV/Carla case the perturb.-path might "wiggle" and hit ego more than once
+        bAllowMultipleIntersections: bool = True
+
         advPathList = advGraphPath.path
         nPtAdv_intersect = 0
         nPtEgo_intersect = 0
@@ -100,12 +108,17 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
             ptAdv = advPathList[nPtAdv].pt
             for nPtEgo in range(agentPath.len()):
                 ptEgo = agentPath.getPoint(nPtEgo)
-                if(ptEgo == ptAdv): #this is ptX
-                    ptX_ret = ptAdv
+                bIsPtX: bool = False
+                if(ptEgo == ptAdv): bIsPtX = True
+                elif(nPtEgo>0 and nPtAdv>0 and self.isDiagonalCross(ptEgo, agentPath.getPoint(nPtEgo-1), ptAdv, advPathList[nPtAdv-1].pt)):
+                    bIsPtX = True #// this is ptX or its is a diagonalCross (see note above)
+                if(bIsPtX):
+                    if(nNumIntersections == 0): #take first intersection, if many are allowed
+                        ptX_ret = ptAdv
+                        nPtAdv_intersect = nPtAdv
+                        nPtEgo_intersect = nPtEgo
                     nNumIntersections += 1
-                    nPtAdv_intersect = nPtAdv
-                    nPtEgo_intersect = nPtEgo
-                    if(nNumIntersections > 1):
+                    if((not bAllowMultipleIntersections) and nNumIntersections > 1):
                         return TimePtPack(len(advPathList) * 500, -2)
         if(nNumIntersections == 0):
             return TimePtPack(agentPath.len()*1000,-1)
@@ -115,6 +128,14 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
         agentPoint = agentPath.get(nPtEgo_intersect)
 
         return TimePtPack(abs(__adv.time - agentPoint.time), ptX_ret)
+    
+    """
+    // @return: is this a diagonalCross?
+	//    o x
+	//    x o
+    """
+    def isDiagonalCross(self, ptEgo: int, ptEgo_m1: int, ptAdv: int, ptAdv_m1: int):
+        pass
 
     def calcPathToPathDistance(self, perturbedPath, vanillaPath, bIsBestPerturbedPath) -> float:
         #perturbedPath.__class__ = GraphPath_Adversary5_HybridDistrib

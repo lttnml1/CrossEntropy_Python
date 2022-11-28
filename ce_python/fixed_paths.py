@@ -53,7 +53,7 @@ class FixedPaths:
 			"(16,12)" + \
 			"(17,12)" + \
 			"(18,12)"
-        FixedPaths.egoPath = GraphPath_Ego.from_fixed_path(path_str2, TYPE_OF_RV.SPEED_RV, environment)
+        FixedPaths.egoPath = GraphPath_Ego.from_fixed_path(path_str, TYPE_OF_RV.SPEED_RV, environment)
     
     @staticmethod
     def findMeetPoints(adversary1_seq, adversary2_seq):

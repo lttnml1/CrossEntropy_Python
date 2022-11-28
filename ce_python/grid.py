@@ -25,13 +25,12 @@ class Grid:
     def Grid_constructor(self) -> None:
         #all values already initialized to ones in constructor: "np.ones..."
         
-        
+        """
         #highway: block out all lanes for which j < 9 or j > 15
-
         self._grid[:,:9] = -1
         self._grid[:,16:] = -1
-        
         """
+        
         #cone
         self._grid[3:7,13:17] = 0
         
@@ -76,7 +75,7 @@ class Grid:
 
         np.set_printoptions(linewidth=np.inf)
         #print(self._grid)
-        """
+        
         #**DID NOT IMPLEMENT the section for: //***When height > 20 then add more obstacles
     
     def getGrid(self) -> np.ndarray:

@@ -24,6 +24,24 @@ class RVDistribution(ABC):
         self.eNEW_CODE = my_CE_Manager.eNEW_CODE
         self.scored_graphpath_samples = []
         self.rand = my_CE_Manager.rand
+
+    #=================
+    # * 11/22/22
+    def get_m(self):
+        return self.my_CE_Manager.get_m()
+    def set_m(self, _m):
+        self.my_CE_Manager.set_m(_m)
+    def get_eNEW_CODE(self):
+        return self.eNEW_CODE
+    def set_eNEW_CODE(self, _eNEW_CODE):
+        self.eNEW_CODE = _eNEW_CODE
+        self.my_CE_Manager.set_eNEW_CODE(_eNEW_CODE)
+    def get_rho_quantile_idx(self):
+        return self.rho_quantile_idx
+    def set_rho_quantile_idx(self, n):
+        self.rho_quantile_idx = n
+        self.my_CE_Manager.set_rho_quantile_idx(n)
+    
     @abstractmethod
     def initDistribution(self):
         pass
@@ -95,13 +113,13 @@ class RVDistribution(ABC):
         elif(self.eNEW_CODE == CODE_EFFICIENCIES.NEW_CODE_FAST):
             retArray = self.generateScoredGraphPathSamples_NEW_CODE_FAST(nAgent, _N, t)
         elif(self.eNEW_CODE == CODE_EFFICIENCIES.CARLA_CODE):
-            retArray = self.generateScoredGraphPathSamples_CARLA(nAgent, _N, t)
+            print("***USING CARLA CODE***")
+            retArray = self.generateScoredGraphPathSamples_NEW_CODE_FAST(nAgent, _N, t)
         else:
             raise Exception("Unexpected case in generateScoredGraphPathSamples()")
         return retArray
     
-    def generateScoredGraphPathSamples_CARLA(self, nAgent: int, _N: int, t: int):
-        raise NotImplementedError("generateScoredGraphPathSamples_CARLA not implemented")
+    
     def generateScoredGraphPathSamples_NEW_CODE_SLOW(self, nAgent: int, _N: int, t: int):
         raise NotImplementedError("generateScoredGraphPathSamples_NEW_CODE_SLOW not implemented")
     def generateScoredGraphPathSamples_OLD_CODE(self, nAgent: int, _N: int, t: int):
@@ -167,6 +185,7 @@ class RVDistribution(ABC):
             _score1 = self.score(graphPath,t) #for debug
             scoredGraphPath = scoredGraphPath(graphPath,_score1)
         return scoredGraphPath
+    
     
     # //all samples (paths) with score > gamma (see that code here and code in gamma() are the same, but we really don't use gamma()...)
     def highScoredPaths(self):

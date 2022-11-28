@@ -22,6 +22,21 @@ class CE_Manager:
     def setMyRVDistribution(self, rvDistribution):
         self.myRVDistribution = rvDistribution
     
+    #=================
+    # * 11/22/22
+    def get_m(self):
+        return self.m
+    def set_m(self, _m):
+        self.m = _m
+    def get_eNEW_CODE(self):
+        return self.eNEW_CODE
+    def set_eNEW_CODE(self, _eNEW_CODE):
+        self.eNEW_CODE = _eNEW_CODE
+    def get_rho_quantile_idx(self):
+        return self.rho_quantile_idx
+    def set_rho_quantile_idx(self, n):
+        self.rho_quantile_idx = n
+
     """
     // mark neighbors to not allow them to visit lastVertexInPath
 	// Remember second dimension codes (where up is "higher i's"):
@@ -114,7 +129,7 @@ class CE_Manager:
     def getClassName(__rvDistribution): 
         raise NotImplementedError("ce_manager getClassName not implemented")
         #__rvDistribution.__class__.__name__
-    
+
     @staticmethod
     def isRigidConstraintsSatisfied(rvDistribution) -> bool:
         score = rvDistribution.getScoredGraphPath(0).getScore()

@@ -168,7 +168,7 @@ class GraphPath:
 		return len(self.path)
 
 	def isGoodPath(self) -> bool:
-		return self.isGoodPath
+		return self.bIsGoodPath
 	
 	def setNotGoodPath(self) -> None:
 		self.bIsGoodPath = False

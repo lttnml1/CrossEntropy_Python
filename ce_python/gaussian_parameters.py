@@ -6,6 +6,7 @@ import math
 #INSTALLED PACKAGE IMPORTS
 
 #IMPORTS FROM THIS PACKAGE
+from ce_python.test_constants import TestConstants
 
 class GaussianParameters:
     def __init__(self, mu: float, sigma: float):
@@ -49,7 +50,7 @@ class GaussianParameters:
         d_l = GaussianParameters.cdf(lower_limit,mu,sigma)
         if(d_l < 0): return 0 #theoretically a negative cdf is impossible, but the Taylor series impl makes it possible
         diff = d_u - d_l
-        if(diff<0):
+        if(diff<0 and abs(diff) > TestConstants.EPSILON): # * 11/22/22
             raise Exception("diff < 0 in cdf_in_range() even though d_u > 0")
         return diff
     

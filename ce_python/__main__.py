@@ -10,7 +10,7 @@ import time
 
 if __name__ == '__main__':
 
-    CE_SEARCH = False
+    CE_SEARCH = True
     CARLA_RUN = False
     ANALYZE_FILES = False
     
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     
     
 
-    
+    """
     from ce_python import CARLA
     files = [
         "C:\\Users\\m.litton_local\\CrossEntropy_Python\\data_archive\\left_to_right_lane_change_highway\\data\\0_perturbed.txt",
@@ -96,4 +96,4 @@ if __name__ == '__main__':
         s = CARLA.Scenario(file)
         s.game_loop()
         time.sleep(2)
-    
+    """
