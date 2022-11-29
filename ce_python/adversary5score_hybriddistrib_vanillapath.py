@@ -25,13 +25,12 @@ class Adversary5Score_HybridDistrib_VanillaPath(Abstract_Adversary5Score_HybridD
     def specificScore(self, graphPath: object, t: int) -> float:
         dRetDistanceFromPerturbed = 0
         egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath, graphPath)
-        egoToAdv5TimeDiff = egoToAdv5TimeDiffPack.dTime
         ptX = egoToAdv5TimeDiffPack.ptX
         
         dRetDistanceFromPerturbed = 1000 #just penalty for being round 0 and not having this.rvDistributions_vanilla yet
         if(t>0):
             bestPerturbedScoredGraphPath = self.rvDistributions_perturbed.getScoredGraphPath(0).graphPath
-            dDistance = self.calcPathToPathDistance(bestPerturbedScoredGraphPath, graphPath, True) #distance between this and vanilla -- smaller is better, and the intersection point
+            dDistance = self.calcPathToPathDistance(bestPerturbedScoredGraphPath, graphPath, bestPerturbedScoredGraphPath.isGoodPath()) #distance between this and vanilla -- smaller is better, and the intersection point
             if(dDistance == 0):
                 dRetDistanceFromPerturbed = BadScoreLevels.BAD_PATH #dDistance=0  happens when bestVanillaScoredGraphPath and graphPath are same path - that is a violation of a rigid constraint for the paired <vanilla/perturbation> approach (the two HAVE to be different, otherwise how would one be good while the other is bad?)
             else:
@@ -49,7 +48,7 @@ class Adversary5Score_HybridDistrib_VanillaPath(Abstract_Adversary5Score_HybridD
         #END Normal Part*************
 
         #Vanilla path --> no accident
-        egoToAdv5TimeDiff = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath,graphPath).dTime
+        egoToAdv5TimeDiff = egoToAdv5TimeDiffPack.dTime
         if(egoToAdv5TimeDiff < 1): #NO accident! --> if there is, then its a rigid constraint failure
             egoToAdv5TimeDiff = 1000*egoToAdv5TimeDiff #make it very high positive so it becomes rigid constraint
         else:

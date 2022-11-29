@@ -2,10 +2,13 @@
 
 #NATIVE PYTHON IMPORTS
 import time
+import sys
+import pathlib
 
 #INSTALLED PACKAGE IMPORTS
 
 #IMPORTS FROM THIS PACKAGE
+sys.path.append(str(pathlib.Path(__file__).parent.parent.resolve()))
 
 
 if __name__ == '__main__':

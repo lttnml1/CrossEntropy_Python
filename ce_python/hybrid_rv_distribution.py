@@ -16,7 +16,7 @@ class HybridRVDistribution(CategoricalRVDistribution):
     // most of the complex code for hybrid can be inherited from Categorical, including trans_mat
     // matrix size n with speed/accel normal distrib
     """
-    def __init__(self, nSrc: int, nDest: int, bAllowStutter: bool, scoreObject: 'AbstractScore', clazz: str, eTYPE_OF_RV: 'TYPE_OF_RV', my_CE_Manager: 'CE_Manager') -> None:
+    def __init__(self, nSrc: int, nDest: int, bAllowStutter: bool, scoreObject, clazz: str, eTYPE_OF_RV: 'TYPE_OF_RV', my_CE_Manager) -> None:
         super().__init__(nSrc, nDest, bAllowStutter, scoreObject, clazz, eTYPE_OF_RV, my_CE_Manager)
 
         self.gaussianParameters_grid = []
@@ -39,9 +39,9 @@ class HybridRVDistribution(CategoricalRVDistribution):
             self.gaussianParameters_grid[i] = gaussianParameters
     
     #For this Categorical distribution example: a "part" of a sample is a path
-    def generateGraphPath(self, nAgent: int) -> 'GraphPath':
+    def generateGraphPath(self, nAgent: int):
         #Categorical Part, taken from CategoricalRVDistribution
-        path: 'GraphPath' = super().generateGraphPath(nAgent)
+        path = super().generateGraphPath(nAgent)
         #---------end Categorical Part
 
         #Normal distrib Part, taken from NormalRVDistribution

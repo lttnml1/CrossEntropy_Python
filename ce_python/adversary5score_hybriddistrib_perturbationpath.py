@@ -14,6 +14,7 @@ from ce_python.bad_score_levels import BadScoreLevels
 #^^^^^moved this import down to specificScore because it was causing circular dependency with TestCase_Adv5Only_accel
 
 from ce_python.gaussian_parameters import GaussianParameters
+from ce_python.bad_score_levels import BadScoreLevels
 
 """
 //See "DMV-NL Strategy"-NOTE
@@ -34,6 +35,10 @@ class Adversary5Score_HybridDistrib_PerturbationPath(Abstract_Adversary5Score_Hy
     """
     def specificScore(self, graphPath: object, t: int) -> float:
         from ce_python.testcase_adv5only_accel import TestCase_Adv5Only_accel
+
+        dRetNormal: float = 0.0
+        dRetCategorical: float = 0.0
+
         egoToAdv5TimeDiffPack = self.getAgentToAdvTimeDiffPack(FixedPaths.egoPath, graphPath) #time diff of point it intersects ego's path w.r.t. when ego gets there
         egoToAdv5TimeDiff = egoToAdv5TimeDiffPack.dTime
         ptX = egoToAdv5TimeDiffPack.ptX
@@ -44,6 +49,9 @@ class Adversary5Score_HybridDistrib_PerturbationPath(Abstract_Adversary5Score_Hy
             truncatedPath = graphPath.truncatePathAfterPoint(ptX)
             graphPath.__class__ = GraphPath_Adversary5_HybridDistrib
             graphPath.setTruncatedPath(truncatedPath) #remember the truncated path prefix
+        else:
+            dRetCategorical = BadScoreLevels.BAD_PATH/2
+
         bestVanillaScoredGraphPath = None
         dRetDistanceFromVanilla = 1000 #just penalty for being round 0 and not having this.rvDistributions_vanilla yet
         if(t>0):
@@ -54,8 +62,6 @@ class Adversary5Score_HybridDistrib_PerturbationPath(Abstract_Adversary5Score_Hy
             else:
                 dRetDistanceFromVanilla = -1/dDistance #// smaller is better; have it negative too. 
     			#//dRetDistanceFromVanilla = dRetDistanceFromVanilla/SHORTEST_DIST_PREFERENCE_WEIGHT; // make much smaller so that shortest path is more important than dist from vanilla
-        dRetCategorical = 0
-        dRetNormal = 0
 
         #Categorical Part************
         dRetCategorical += self.categoricalDistribScorePart(graphPath, self.nDest)

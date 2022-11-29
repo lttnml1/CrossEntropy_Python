@@ -11,7 +11,6 @@ import math
 from ce_python.abstract_score import AbstractScore
 from ce_python.bad_score_levels import BadScoreLevels
 from ce_python.test_constants import TestConstants
-from ce_python.graph_path_adversary5_hybriddistrib import GraphPath_Adversary5_HybridDistrib
 
 """
 //See "DMV-NL Strategy"-NOTE
@@ -135,7 +134,20 @@ class Abstract_Adversary5Score_HybridDistrib(AbstractScore, ABC): #only extends 
 	//    x o
     """
     def isDiagonalCross(self, ptEgo: int, ptEgo_m1: int, ptAdv: int, ptAdv_m1: int):
-        pass
+        pairEgo: 'ChessBoardPositionPair' = self.environment.fromVertexToPair(ptEgo)
+        pairEgo_m1 = self.environment.fromVertexToPair(ptEgo_m1)
+        pairAdv = self.environment.fromVertexToPair(ptAdv)
+        pairAdv_m1 = self.environment.fromVertexToPair(ptAdv_m1)
+
+        nHorizDiff1: int = pairEgo_m1.get_j() - pairAdv_m1.get_j()
+        nHorizDiff2: int = pairEgo.get_j() - pairAdv.get_j()
+        nVerticalDiff1: int = pairEgo_m1.get_i() - pairAdv_m1.get_i()
+        nVerticalDiff2: int = pairEgo.get_i() - pairAdv.get_i()
+
+        b: bool = (nHorizDiff1 + nHorizDiff2 == 0) and (nVerticalDiff1 + nVerticalDiff2 == 0)
+
+        return b
+
 
     def calcPathToPathDistance(self, perturbedPath, vanillaPath, bIsBestPerturbedPath) -> float:
         #perturbedPath.__class__ = GraphPath_Adversary5_HybridDistrib

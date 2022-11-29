@@ -119,7 +119,11 @@ class TestCase_Adv5Only_accel:
 
             t: int = 0
 
+            self.m: int = TestConstants.NUMBER_OF_POSSIBLE_MOVES
             self.eNEW_CODE = CODE_EFFICIENCIES.NEW_CODE_FAST
+
+            self.rho_quantile_idx: int = int(round(TestConstants.RHO * self.c * self.n * self.m))
+            _N: int = int(TestCase_Adv5Only_accel.C * self.n * self.m)
 
             rvDistribution_vanilla.set_eNEW_CODE(self.eNEW_CODE)
             rvDistribution_vanilla.set_m(self.m)
@@ -154,7 +158,7 @@ class TestCase_Adv5Only_accel:
                         rvDistribution_perturbation.set_rho_quantile_idx(self.rho_quantile_idx)
 
                     if(self.rho_quantile_idx < 6):
-                        raise Exception(f"self.rho_quantile_idx ({self.rho_quantile_idx}) is too small (less than 10) to gather statistics from")
+                        raise Exception(f"self.rho_quantile_idx ({self.rho_quantile_idx}) is too small (less than 6) to gather statistics from")
 
                 while_cond_array: List[bool] = [True] * TestCase_Adv5Only_accel.NO_OF_PATHS
                 gammas = self.initGammas(nBatch, rvDistribution_vanilla, rvDistribution_perturbation)
@@ -191,10 +195,10 @@ class TestCase_Adv5Only_accel:
             #*********************END FOR(nBatch)
 
             #******** experimenting with getting a higher variance data-set
-            _bestScoredGraphPath_perturbation: 'ScoredGraphPath' = rvDistribution_perturbation.getScoredGraphPath(0)
+            _bestScoredGraphPath_perturbation = rvDistribution_perturbation.getScoredGraphPath(0)
 
             #//DORON-ASSUMPTION-NOTE: although Categorical is obviously not Normal distrib, I think of the paths that can be discovered using Categorical CE as Normally distributed!\
-            __graphPath: 'GraphPath_Adversary5_HybridDistrib' = _bestScoredGraphPath_perturbation.graphPath
+            __graphPath = _bestScoredGraphPath_perturbation.graphPath
             dCategoricalPathMeasure: float = __graphPath.getCategoricalPathMeasure(__graphPath.getTruncatedPath())
             TestCase_Adv5Only_accel.dAvgCategorical = (dCategoricalPathMeasure + TestCase_Adv5Only_accel.dAvgCategorical * TestCase_Adv5Only_accel.nPaths)/(TestCase_Adv5Only_accel.nPaths+1)
             d: float = abs(dCategoricalPathMeasure - TestCase_Adv5Only_accel.dAvgCategorical)
@@ -213,11 +217,16 @@ class TestCase_Adv5Only_accel:
 
 
             last_bestScoredGraphPath_vanilla = None
-            last_bestScoredGraphPath_perturbation = None
             if(CE_Manager.isRigidConstraintsSatisfied(rvDistribution_vanilla) and rvDistribution_vanilla.areConstraintsSatisfied()):
+                if(first_bestScoredGraphPath_vanilla is None):
+                    first_bestScoredGraphPath_vanilla = rvDistribution_vanilla.getScoredGraphPath(0)
                 last_bestScoredGraphPath_vanilla = rvDistribution_vanilla.getScoredGraphPath(0)
                 bestScoredGraphPaths_vanilla.append(last_bestScoredGraphPath_vanilla)
+
+            last_bestScoredGraphPath_perturbation = None
             if(CE_Manager.isRigidConstraintsSatisfied(rvDistribution_perturbation) and rvDistribution_perturbation.areConstraintsSatisfied()):
+                if(first_bestScoredGraphPath_perturbation is None):
+                    first_bestScoredGraphPath_perturbation = rvDistribution_perturbation.getScoredGraphPath(0)
                 last_bestScoredGraphPath_perturbation = rvDistribution_perturbation.getScoredGraphPath(0)
                 bestScoredGraphPaths_perturbation.append(last_bestScoredGraphPath_perturbation)
             assert last_bestScoredGraphPath_perturbation, "last_bestScoredGraphPath_perturbation is None"
